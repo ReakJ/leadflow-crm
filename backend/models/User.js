@@ -1,0 +1,68 @@
+import mongoose from "mongoose";
+import validator from "validator";
+import bcrypt from "bcrypt";
+
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+      lowercase: true,
+      trim: true,
+      validate: {
+        validator: validator.isEmail,
+        message: "Invalid email address."
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      select: false,
+      minlength: [8, "Password must be at least 8 characters."]
+    },
+    role: {
+      enum: ["admin", "member"],
+      type: String,
+      required: true,
+      default: "member"
+    }
+  },
+  { timestamps: true }
+);
+
+userSchema.pre("save", async function (next) {
+  if(!this.isModified("password")) {
+    return next();
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(Number(process.env.BCRYPT_SALT_ROUNDS));
+    this.password = await bcrypt.hash(this.password, salt);
+  } catch (error) {
+    next(error);
+  }
+});
+
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
+userSchema.methods.toSafeObject = function () {
+    return {
+        id: this._id.toString(),
+        name: this.name,
+        email: this.email,
+        role: this.role,
+    };
+};
+
+const User = mongoose.model("User", userSchema)
+
+export default User;
