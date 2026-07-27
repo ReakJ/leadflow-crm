@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
+import leadRoutes from "./routes/leadRoutes.js";
 import { errorMiddleware } from "./middleware/errorMiddleware.js";
 
 dotenv.config();
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
   res.send("LeadFlow CRM Backend is Running!");
 })
 app.use("/api/auth", authRoutes);
+app.use("/api/leads", leadRoutes);
 
 app.use(errorMiddleware);
 
