@@ -82,3 +82,21 @@ export const updateLead = async (req, res, next) => {
     return next(error);
   }
 }
+
+export const assignLead = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { assignedTo } = req.body;
+    
+    const lead = await leadService.assignLead(id, assignedTo);
+    return res.status(200).json({
+      success: true,
+      "message": "Lead assigned successfully.",
+      data: {
+        lead
+      }
+    })
+  } catch (error) {
+    return next(error);
+  }
+}

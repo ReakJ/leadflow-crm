@@ -1,5 +1,6 @@
 import ApiError from "../errors/ApiError.js";
 import Lead from "../models/Lead.js"
+import User from "../models/User.js";
 
 export const createLead = async (leadData) => {
   const duplicateCheck = await Lead.findOne({email: leadData.email, isDeleted: false});
@@ -87,3 +88,42 @@ export const updateLead = async (id, updateData) => {
   
   return lead;
 }
+
+
+export const assignLead = async (leadId, assignedTo) => {
+  const lead = await Lead.findOne({_id: leadId, isDeleted: false});
+
+  if (!lead) {
+    throw new ApiError(404, "Lead not found.");
+  }
+
+  const closedStatuses = ["Won", "Lost"];
+
+  if(closedStatuses.includes(lead.status)) {
+    throw new ApiError(400, "Cannot assign a lead that is already Won or Lost.");
+  }
+
+
+  const user = await User.findById(assignedTo);
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  const assignableRoles = ["manager", "member"];
+
+  if (!assignableRoles.includes(user.role)) {
+    throw new ApiError(400, "Lead can only be assigned to a manager or member.");
+  }
+
+
+  lead.assignedTo = user._id;
+
+  if (lead.status === "New") {
+    lead.status = "Assigned";
+  }
+
+  await lead.save()
+
+  return lead;
+};
