@@ -20,3 +20,65 @@ export const createLead = async (req, res, next) => {
     return next(error)
   }
 }
+
+export const getLeads = async (req, res, next) => {
+  try {
+    const user = {
+      userId: req.user._id,
+      role: req.user.role
+    };
+
+    const leads = await leadService.getLeads(user);
+    return res.status(200).json ({
+      success: true,
+      "message": "Leads retrieved successfully.",
+      data: {
+        leads
+      }
+    });
+
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export const getLeadById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const user = {
+      userId: req.user._id,
+      role: req.user.role
+    };
+
+    const lead = await leadService.getLeadById(id, user);
+    return res.status(200).json ({
+      success: true,
+      "message": "Lead retrieved successfully.",
+      data: {
+        lead
+      }
+    });
+
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export const updateLead = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const updateData = req.body;
+    const lead = await leadService.updateLead(id, updateData);
+    return res.status(200).json({
+      success: true,
+      "message": "Lead updated successfully.",
+      data: {
+        lead
+      }
+    })
+  } catch (error) {
+    return next(error);
+  }
+}
