@@ -100,3 +100,41 @@ export const assignLead = async (req, res, next) => {
     return next(error);
   }
 }
+
+export const changeLeadStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const currentUser = req.user;
+
+    const lead = await leadService.changeLeadStatus(id, status, currentUser);
+    return res.status(200).json({
+      success: true,
+      "message": "Lead status changed successfully.",
+      data: {
+        lead
+      }
+    })
+  } catch (error) {
+    return next (error);
+  }
+}
+
+export const addNote = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { text } = req.body;
+    const currentUser = req.user;
+
+    const lead = await leadService.addNote(id, text, currentUser);
+    return res.status(201).json({
+      success: true,
+      "message": "Note added successfully.",
+      data: {
+        lead
+      }
+    })
+  } catch (error) {
+    return next (error);
+  }
+}

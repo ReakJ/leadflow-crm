@@ -1,5 +1,5 @@
 import ApiError from "../errors/ApiError.js";
-import Lead from "../models/Lead.js"
+import Lead, { LEAD_STATUSES } from "../models/Lead.js"
 import User from "../models/User.js";
 
 export const createLead = async (leadData) => {
@@ -33,13 +33,15 @@ export const getLeads = async (user) => {
 
 
 export const getLeadById = async (id, user) => {
-  const lead = await Lead.findOne({_id: id, isDeleted: false});
+  const lead = await Lead.findOne({_id: id, isDeleted: false}).populate("assignedTo", "name email role")
+  .populate("createdBy", "name email role")
+  .populate("notes.addedBy", "name email role");
 
   if (!lead) {
     throw new ApiError(404, "Lead not found.");
   }
 
-  if (user.role === "member" && !lead.assignedTo.equals(user.userId)) {
+  if (user.role === "member" && !lead.assignedTo || !lead.assignedTo._id.equals(user.userId)) {
     throw new ApiError(403, "You are not authorized to access this lead.");
   }
 
@@ -103,7 +105,6 @@ export const assignLead = async (leadId, assignedTo) => {
     throw new ApiError(400, "Cannot assign a lead that is already Won or Lost.");
   }
 
-
   const user = await User.findById(assignedTo);
 
   if (!user) {
@@ -116,7 +117,6 @@ export const assignLead = async (leadId, assignedTo) => {
     throw new ApiError(400, "Lead can only be assigned to a manager or member.");
   }
 
-
   lead.assignedTo = user._id;
 
   if (lead.status === "New") {
@@ -127,3 +127,87 @@ export const assignLead = async (leadId, assignedTo) => {
 
   return lead;
 };
+
+
+export const changeLeadStatus = async (leadId, newStatus, currentUser) => {
+  const lead = await Lead.findOne({
+    _id: leadId, 
+    isDeleted: false
+  })
+
+  if (!lead) {
+    throw new ApiError(404, "Lead not found.");
+  }
+
+  const closedStatuses = ["Won", "Lost"];
+
+  if (closedStatuses.includes(lead.status)) {
+    throw new ApiError(400, "Cannot change the status of a lead that is already won or lost.")
+  }
+  
+  if (currentUser.role === "member" && (!lead.assignedTo || !lead.assignedTo.equals(currentUser._id))) {
+    throw new ApiError(403, "You can only update the status of leads assigned to you.");
+  } 
+
+  if (!LEAD_STATUSES.includes(newStatus)) {
+    throw new ApiError(400, "Invalid lead status.");
+  }
+
+  if (lead.status === newStatus) {
+    return lead;
+  }
+
+  const allowedTransitions = {
+    New: ["Assigned"],
+    Assigned: ["Contacted", "Lost"],
+    Contacted: ["Qualified", "Lost"],
+    Qualified: ["Proposal Sent", "Lost"],
+    "Proposal Sent": ["Negotiation", "Lost"],
+    Negotiation: ["Won", "Lost"],
+    Won: [],
+    Lost: [],
+  };
+
+  const nextStatuses = allowedTransitions[lead.status];
+
+  if(!nextStatuses.includes(newStatus)) {
+    throw new ApiError(400,`Cannot change lead status from "${lead.status}" to "${newStatus}".`);
+  }
+
+  lead.status = newStatus;
+  
+  await lead.save();
+
+  return lead;
+}
+
+
+export const addNote = async (leadId, text, currentUser) => {
+  const trimmedText = text?.trim();
+
+  if (!trimmedText) {
+    throw new ApiError(400, "Note text is required.");
+  }
+
+  if (trimmedText.length > 1000) {
+    throw new ApiError(400, "Note cannot exceed 1000 characters.");
+  }
+
+  const lead = await Lead.findOne({_id: leadId, isDeleted: false});
+
+  if (!lead) {
+      throw new ApiError(404, "Lead not found.");
+  }
+
+  if (currentUser.role === "member" && (!lead.assignedTo || !lead.assignedTo.equals(currentUser._id))) {
+    throw new ApiError(403, "You can only add notes to leads assigned to you.");
+  }
+
+  const note = {text: trimmedText, addedBy: currentUser._id};
+
+  lead.notes.push(note);
+
+  await lead.save();
+
+  return lead;
+}

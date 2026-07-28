@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import validator from "validator"
 
-const LEAD_STATUS = ["New", "Assigned", "Contacted", "Qualified", "Proposal Sent", "Negotiation", "Won", "Lost"];
+export const LEAD_STATUSES = ["New", "Assigned", "Contacted", "Qualified", "Proposal Sent", "Negotiation", "Won", "Lost"];
 
-const LEAD_SOURCE = ["Website", "Referral", "LinkedIn", "Facebook", "Instagram", "Cold Call", "Email Campaign", "Other"];
+export const LEAD_SOURCES = ["Website", "Referral", "LinkedIn", "Facebook", "Instagram", "Cold Call", "Email Campaign", "Other"];
 
 const noteSchema = new mongoose.Schema({
   text: {
@@ -48,12 +48,12 @@ const leadSchema = new mongoose.Schema({
   },
   source: {
     type: String,
-    enum: LEAD_SOURCE,
+    enum: LEAD_SOURCES,
     required: true,
   },
   status: {
     type: String,
-    enum: LEAD_STATUS,
+    enum: LEAD_STATUSES,
     default: "New"
   },
   assignedTo: {
