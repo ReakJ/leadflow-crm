@@ -211,3 +211,38 @@ export const addNote = async (leadId, text, currentUser) => {
 
   return lead;
 }
+
+export const deleteLead = async(leadId, currentUser) => {
+  const lead = await Lead.findOne({
+    _id: leadId, 
+    isDeleted: false 
+  });
+
+  if (!lead) {
+    throw new ApiError(404, "Lead not found.");
+  }
+
+  lead.isDeleted = true;
+  lead.deletedAt = new Date();
+  lead.deletedBy = currentUser._id;
+
+  await lead.save(); 
+}
+
+
+export const restoreLead = async(leadId) => {
+  const lead = await Lead.findOne({
+    _id: leadId,
+    isDeleted: true
+  });
+
+  if (!lead) {
+    throw new ApiError(404, "Lead not found.");
+  }
+
+  lead.isDeleted = false;
+  lead.deletedAt = null;
+  lead.deletedBy = null;
+
+  await lead.save();
+}

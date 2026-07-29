@@ -138,3 +138,32 @@ export const addNote = async (req, res, next) => {
     return next (error);
   }
 }
+
+export const deleteLead = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const currentUser = req.user;
+
+    await leadService.deleteLead(id, currentUser);
+    return res.status(200).json({
+      success: true,
+      "message": "Lead deleted successfully.",
+    })
+  } catch (error) {
+    return next (error);
+  }
+}
+
+export const restoreLead = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    await leadService.restoreLead(id);
+    return res.status(200).json({
+      success: true,
+      "message": "Lead restored successfully.",
+    })
+  } catch (error) {
+    return next (error);
+  }
+}
