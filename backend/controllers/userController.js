@@ -16,3 +16,17 @@ export const createUser = async (req, res, next) => {
     return next(error)
   }
 }
+
+export const getUsers = async (req, res, next) => {
+  try {
+    const users = await userService.getUsers(req.user);
+    return res.status(200).json({
+      success: true,
+      count: users.length,
+      message: "Users fetched successfully.",
+      users,
+    });
+  } catch (error) {
+    return next(error)
+  }
+}

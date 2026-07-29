@@ -27,3 +27,11 @@ export const createUser = async (userData, currentUser) => {
 
   return user.toSafeObject();
 };
+
+export const getUsers = async (currentUser) => {
+  const users = await User.find({
+    isDeleted: false
+  }).sort({ createdAt: -1 });
+
+  return users.map(user => user.toSafeObject());
+}
