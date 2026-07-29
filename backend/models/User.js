@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
 
+export const USER_ROLES = [
+    "admin",
+    "manager",
+    "member",
+];
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -28,11 +34,32 @@ const userSchema = new mongoose.Schema(
       minlength: [8, "Password must be at least 8 characters."]
     },
     role: {
-      enum: ["admin", "manager", "member"],
+      enum: USER_ROLES,
       type: String,
       required: true,
-      default: "member"
+    },
+    isActive: {
+      type: Boolean,
+      default: true
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false
+    },
+    deletedAt: {
+      type: Date,
+      default: null
+    },
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref:"User",
+      default: null
+    },
+    lastLoginAt: {
+      type: Date,
+      default: null
     }
+    
   },
   { timestamps: true }
 );
@@ -60,6 +87,7 @@ userSchema.methods.toSafeObject = function () {
         name: this.name,
         email: this.email,
         role: this.role,
+        isActive: this.isActive
     };
 };
 
