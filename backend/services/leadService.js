@@ -1,6 +1,7 @@
 import ApiError from "../errors/ApiError.js";
 import Lead, { LEAD_STATUSES } from "../models/Lead.js"
 import User from "../models/User.js";
+import { validateObjectId } from "../utils/validateObjectId.js";
 
 export const createLead = async (leadData) => {
   const duplicateCheck = await Lead.findOne({email: leadData.email, isDeleted: false});
@@ -33,6 +34,8 @@ export const getLeads = async (user) => {
 
 
 export const getLeadById = async (id, user) => {
+  validateObjectId(id, "lead");
+
   const lead = await Lead.findOne({_id: id, isDeleted: false}).populate("assignedTo", "name email role")
   .populate("createdBy", "name email role")
   .populate("notes.addedBy", "name email role");
@@ -50,6 +53,8 @@ export const getLeadById = async (id, user) => {
 
 
 export const updateLead = async (id, updateData) => {
+  validateObjectId(id, "lead");
+
   const lead = await Lead.findOne({_id: id, isDeleted: false});
 
   if (!lead) {
@@ -93,6 +98,8 @@ export const updateLead = async (id, updateData) => {
 
 
 export const assignLead = async (leadId, assignedTo) => {
+  validateObjectId(leadId, "lead");
+
   const lead = await Lead.findOne({_id: leadId, isDeleted: false});
 
   if (!lead) {
@@ -130,6 +137,8 @@ export const assignLead = async (leadId, assignedTo) => {
 
 
 export const changeLeadStatus = async (leadId, newStatus, currentUser) => {
+  validateObjectId(leadId, "lead");
+
   const lead = await Lead.findOne({
     _id: leadId, 
     isDeleted: false
@@ -183,6 +192,8 @@ export const changeLeadStatus = async (leadId, newStatus, currentUser) => {
 
 
 export const addNote = async (leadId, text, currentUser) => {
+  validateObjectId(leadId, "lead");
+
   const trimmedText = text?.trim();
 
   if (!trimmedText) {
@@ -213,6 +224,8 @@ export const addNote = async (leadId, text, currentUser) => {
 }
 
 export const deleteLead = async(leadId, currentUser) => {
+  validateObjectId(leadId, "lead");
+
   const lead = await Lead.findOne({
     _id: leadId, 
     isDeleted: false 
@@ -231,6 +244,8 @@ export const deleteLead = async(leadId, currentUser) => {
 
 
 export const restoreLead = async(leadId) => {
+  validateObjectId(leadId, "lead");
+
   const lead = await Lead.findOne({
     _id: leadId,
     isDeleted: true

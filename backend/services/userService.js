@@ -1,5 +1,6 @@
 import ApiError from "../errors/ApiError.js";
 import User from "../models/User.js";
+import { validateObjectId } from "../utils/validateObjectId.js";
 
 export const createUser = async (userData, currentUser) => {
   const { name, email, password, role } = userData;
@@ -34,4 +35,19 @@ export const getUsers = async (currentUser) => {
   }).sort({ createdAt: -1 });
 
   return users.map(user => user.toSafeObject());
+}
+
+export const getUserById = async (userId) => {
+  validateObjectId(userId, "user");
+
+  const user = await User.findOne({
+    _id: userId,
+    isDeleted: false,
+  })
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  return user.toSafeObject();
 }
