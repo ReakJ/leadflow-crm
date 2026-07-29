@@ -51,3 +51,46 @@ export const getUserById = async (userId) => {
 
   return user.toSafeObject();
 }
+
+export const updateUserStatus = async (userId, isActive, currentUser) => {
+  validateObjectId(userId, "user");
+
+  const user = await User.findOne({
+    _id: userId,
+    isDeleted: false
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  if (isActive === undefined || isActive === null) {
+    throw new ApiError(400, "'isActive' is required.");
+  }
+
+  if (typeof isActive !== "boolean") {
+    throw new ApiError(400, "'isActive' must be a boolean.");
+  }
+
+  if (user._id.equals(currentUser._id)) {
+    throw new ApiError(403, "You are not allowed to activate or deactivate your own account.");
+  }
+  
+  if (currentUser.role === "manager" && user.role !== "member") {
+    throw new ApiError(403, "Managers can only activate or deactivate member accounts.");
+  }
+
+  if (currentUser.role === "admin" && user.role === "admin") {
+    throw new ApiError(
+      403,
+      "Admins cannot activate or deactivate other admin accounts."
+    );
+  }
+
+
+  user.isActive = isActive;
+
+  await user.save();
+
+  return user.toSafeObject();
+}

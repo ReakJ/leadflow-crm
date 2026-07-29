@@ -45,3 +45,21 @@ export const getUserById = async (req, res, next) => {
     return next(error)
   }
 }
+
+export const updateUserStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { isActive } = req.body;
+    const currentUser = req.user;
+  
+    const user = await userService.updateUserStatus(id, isActive, currentUser);
+    return res.status(200).json({
+      success: true,
+      message: "User status updated successfully.",
+      user,
+    });
+    
+  } catch (error) {
+    return next(error)
+  }
+}
