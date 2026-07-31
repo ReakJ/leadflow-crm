@@ -1,6 +1,6 @@
 import ApiError from "../errors/ApiError.js";
 import Lead from "../models/Lead.js";
-import User from "../models/User.js";
+import User, { USER_ROLES } from "../models/User.js";
 import { validateObjectId } from "../utils/validateObjectId.js";
 
 export const createUser = async (userData, currentUser) => {
@@ -30,10 +30,59 @@ export const createUser = async (userData, currentUser) => {
   return user.toSafeObject();
 };
 
-export const getUsers = async (currentUser) => {
-  const users = await User.find({
-    isDeleted: false
-  }).sort({ createdAt: -1 });
+export const getUsers = async (currentUser, query) => {
+  const {
+    deleted, 
+    active, 
+    role
+  } = query;
+
+  const filter = {};
+
+
+  const allowedDeletedValues = [
+    "true",
+    "false",
+    "all"
+  ];
+
+  if (deleted && !allowedDeletedValues.includes(deleted)) {
+    throw new ApiError(400, "Invalid deleted query parameter.");
+  }
+
+  if (deleted === undefined || deleted === "false") {
+    filter.isDeleted = false;
+  } else if (deleted === "true") {
+    filter.isDeleted = true;
+  }
+
+
+  const allowedActiveValues = [
+    "true",
+    "false"
+  ];
+
+  if (active && !allowedActiveValues.includes(active)) {
+    throw new ApiError(400, "Invalid active query parameter.");
+  }
+
+  if (active === "true") {
+    filter.isActive = true;
+  } else if (active === "false"){
+    filter.isActive = false;
+  }
+
+
+  if (role && !USER_ROLES.includes(role)) {
+    throw new ApiError(400, "Invalid role query parameter.");
+  }
+
+  if (role) {
+   filter.role = role; 
+  }
+
+
+  const users = await User.find(filter).sort({ createdAt: -1 });
 
   return users.map(user => user.toSafeObject());
 }

@@ -14,4 +14,6 @@ router.patch("/:id/status", protect, authorize("admin", "manager"), updateUserSt
 
 router.delete("/:id", protect, authorize("admin", "manager"), deleteUser);
 
+// router.patch("/:id/restore", protect, authorize("admin", "manager"), restoreUser);
+
 export default router;
