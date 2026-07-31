@@ -16,7 +16,11 @@ export const protect = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Finding User
-    const user = await User.findById(decoded.id)
+    const user = await User.findOne({
+      _id: decoded.id,
+      isDeleted: false,
+      isActive: true,
+    })
     
     if (!user) {
       throw new ApiError(401, "Unauthorized. Please log in again.");

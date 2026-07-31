@@ -112,7 +112,11 @@ export const assignLead = async (leadId, assignedTo) => {
     throw new ApiError(400, "Cannot assign a lead that is already Won or Lost.");
   }
 
-  const user = await User.findById(assignedTo);
+  const user = await User.findOne({
+    _id: assignedTo, 
+    isDeleted: false,
+    isActive: true,
+  });
 
   if (!user) {
     throw new ApiError(404, "User not found.");

@@ -7,6 +7,8 @@ export const login = async (email, password) => {
   
   const user = await User.findOne({
     email: normalizedEmail,
+    isDeleted: false,
+    isActive: true,
   }).select("+password");
 
   if (!user) {
