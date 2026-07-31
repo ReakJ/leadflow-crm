@@ -63,3 +63,18 @@ export const updateUserStatus = async (req, res, next) => {
     return next(error)
   }
 }
+
+export const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const currentUser = req.user;
+  
+    await userService.deleteUser(id, currentUser);
+    return res.status(200).json({
+      success: true,
+      "message": "User deleted successfully.",
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
