@@ -30,11 +30,16 @@ export const createUser = async (userData, currentUser) => {
   return user.toSafeObject();
 };
 
-export const getUsers = async (currentUser, query) => {
+export const getUsers = async (query) => {
   const {
     deleted, 
     active, 
-    role
+    role,
+    search,
+    sort,
+    order,
+    page,
+    limit
   } = query;
 
   const filter = {};
@@ -82,9 +87,82 @@ export const getUsers = async (currentUser, query) => {
   }
 
 
-  const users = await User.find(filter).sort({ createdAt: -1 });
+  if(search) {
+    const regex = new RegExp(search, "i");
+    filter.$or = [
+      {
+        name: regex
+      },
+      {
+        email: regex
+      },
+    ]
+  }
 
-  return users.map(user => user.toSafeObject());
+
+  const allowedSortFields = [
+    "name",
+    "email",
+    "createdAt"
+  ];
+
+  const allowedOrderValues = [
+    "asc",
+    "desc"
+  ];
+
+  if (sort && !allowedSortFields.includes(sort)) {
+    throw new ApiError(400, "Invalid sort query parameter.");
+  }
+
+  if (order && !allowedOrderValues.includes(order)) {
+    throw new ApiError(400, "Invalid order query parameter.");
+  }
+
+  let sortOptions = {
+    createdAt: -1
+  };
+
+  if (sort) {
+    sortOptions = {
+      [sort]: order === "desc" ? -1 : 1
+    };
+  }
+
+
+  const pageNumber = page ? Number(page) : 1 ;
+  let limitNumber = limit ? Number(limit) : 10;
+
+  if (Number.isNaN(pageNumber) || pageNumber < 1) {
+    throw new ApiError(400, "Invalid page query parameter.")
+  }
+
+  if (Number.isNaN(limitNumber) || limitNumber < 1) {
+    throw new ApiError(400, "Invalid limit query parameter.")
+  }
+
+  if(limitNumber > 100) {
+    limitNumber = 100;
+  }
+
+  const skip = (pageNumber - 1) * limitNumber;
+
+
+  const users = await User.find(filter).sort(sortOptions).skip(skip).limit(limitNumber);
+  const totalItems = await User.countDocuments(filter);
+  const totalPages = Math.ceil(totalItems / limitNumber);
+
+
+  return {
+    users: users.map(user => user.toSafeObject()),
+    pagination: {
+      page: pageNumber,
+      limit: limitNumber,
+      totalItems,
+      totalPages
+    }
+  } 
+  
 }
 
 export const getUserById = async (userId) => {

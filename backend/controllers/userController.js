@@ -19,12 +19,13 @@ export const createUser = async (req, res, next) => {
 
 export const getUsers = async (req, res, next) => {
   try {
-    const users = await userService.getUsers(req.user, req.query);
+    const { users, pagination } = await userService.getUsers(req.query);
     return res.status(200).json({
       success: true,
       count: users.length,
       message: "Users fetched successfully.",
       users,
+      pagination
     });
   } catch (error) {
     return next(error)
