@@ -18,18 +18,160 @@ export const createLead = async (leadData) => {
 };
 
 
-export const getLeads = async (user) => {
-  if (user.role === "member") {
-    return await Lead.find({
+export const getLeads = async (user, query) => {
+  const {
+    deleted,
+    status,
+    assignedTo,
+    search,
+    sort,
+    order,
+    page,
+    limit
+  } = query;
+
+  let filter;
+
+
+  if(user.role === "member") {
+    filter = {
       assignedTo: user.userId,
-      isDeleted: false,
-    }).sort({ createdAt: -1 });
+      isDeleted: false
+    };
+  } else {
+    filter = {};
   }
 
-  return await Lead.find({
-    isDeleted: false,
-  }).sort({ createdAt: -1 });
 
+  if (deleted) {
+    const allowedDeletedValues = [
+      "true",
+      "false",
+      "all"
+    ];
+
+    if (deleted && !allowedDeletedValues.includes(deleted)) {
+      throw new ApiError(400, "Invalid deleted query parameter.")
+    }
+
+    if (user.role === "member" && deleted) {
+      throw new ApiError(403, "Members are not allowed to see deleted leads.");
+    }
+
+    if (deleted === undefined || deleted === "false") {
+      filter.isDeleted = false;
+    } else if (deleted === "true") {
+      filter.isDeleted = true;
+    }
+  }
+
+  if (status) {
+    if (status && !LEAD_STATUSES.includes(status)) {
+      throw new ApiError(400, "Invalid status query parameter.");
+    }
+  
+    filter.status = status;
+  }
+
+  if (assignedTo) {
+    validateObjectId(assignedTo, "user");
+  
+    const assignedUser = await User.findOne({ 
+      _id: assignedTo,
+      isDeleted: false
+    });
+  
+    if (!assignedUser) {
+      throw new ApiError(404, "User not found.")
+    }
+  
+    const assignableRoles = ["manager", "member"];
+  
+    if (!assignableRoles.includes(assignedUser.role)) {
+      throw new ApiError(400, "Lead can only be assigned to a manager or member.");
+    }
+  
+    if (user.role === "member") {
+      throw new ApiError(403, "Members are not allowed to filter by assigned user.");
+    }
+  
+    filter.assignedTo = assignedUser._id;
+  }
+
+  if (search) {
+    filter.$or = [
+      {
+        name: new RegExp(search, "i")
+      },
+      {
+        email: new RegExp(search, "i")
+      },
+      {
+        company: new RegExp(search, "i")
+      },
+    ];
+  }
+
+  const allowedSortFields = [
+    "name",
+    "company",
+    "createdAt"
+  ];
+
+  const allowedOrderValues = [
+    "asc",
+    "desc"
+  ];
+
+  if (sort && !allowedSortFields.includes(sort)) {
+    throw new ApiError(400, "Invalid sort query parameter.");
+  }
+
+  if (order && !allowedOrderValues.includes(order)) {
+    throw new ApiError(400, "Invalid order query parameter.");
+  }
+
+  let sortOptions = {
+    createdAt: -1
+  };
+
+  if (sort) {
+    sortOptions = {
+      [sort]: order === "desc" ? -1 : 1
+    };
+  }
+
+
+  const pageNumber = page ? Number(page) : 1;
+  let limitNumber = limit ? Number(limit) : 10;
+
+  if (Number.isNaN(pageNumber) || pageNumber < 1) {
+    throw new ApiError(400, "Invalid page query parameter.");
+  }
+
+  if (Number.isNaN(limitNumber) || limitNumber < 1) {
+    throw new ApiError(400, "Invalid limit query parameter.");
+  }
+
+  if (limitNumber > 100) {
+    limitNumber = 100;  
+  }
+
+  const skip = (pageNumber - 1) * limitNumber;
+
+  const leads = await Lead.find(filter).sort(sortOptions).skip(skip).limit(limitNumber);
+  const totalItems = await Lead.countDocuments(filter);
+  const totalPages = Math.ceil(totalItems / limitNumber);
+
+  return {
+    leads,
+    pagination : {
+      page: pageNumber,
+      limit: limitNumber,
+      totalItems,
+      totalPages
+    }
+  }
 };
 
 

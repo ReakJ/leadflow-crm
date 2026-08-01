@@ -28,12 +28,13 @@ export const getLeads = async (req, res, next) => {
       role: req.user.role
     };
 
-    const leads = await leadService.getLeads(user);
+    const { leads, pagination } = await leadService.getLeads(user, req.query);
     return res.status(200).json ({
       success: true,
       "message": "Leads retrieved successfully.",
       data: {
-        leads
+        leads,
+        pagination
       }
     });
 
