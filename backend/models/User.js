@@ -8,6 +8,11 @@ export const USER_ROLES = [
     "member",
 ];
 
+export const ASSIGNABLE_ROLES = [
+    "manager",
+    "member"
+];
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -34,8 +39,8 @@ const userSchema = new mongoose.Schema(
       minlength: [8, "Password must be at least 8 characters."]
     },
     role: {
-      enum: USER_ROLES,
       type: String,
+      enum: USER_ROLES,
       required: true,
     },
     isActive: {

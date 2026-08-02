@@ -1,7 +1,38 @@
 import ApiError from "../errors/ApiError.js";
 import Lead, { LEAD_STATUSES } from "../models/Lead.js"
-import User from "../models/User.js";
+import User, { ASSIGNABLE_ROLES } from "../models/User.js";
 import { validateObjectId } from "../utils/validateObjectId.js";
+
+const allowedDeletedValues = [
+  "true",
+  "false",
+  "all"
+];
+
+const allowedSortFields = [
+  "name",
+  "company",
+  "createdAt"
+];
+
+const allowedOrderValues = [
+  "asc",
+  "desc"
+];
+
+const closedStatuses = ["Won", "Lost"];
+
+const allowedTransitions = {
+  New: ["Assigned"],
+  Assigned: ["Contacted", "Lost"],
+  Contacted: ["Qualified", "Lost"],
+  Qualified: ["Proposal Sent", "Lost"],
+  "Proposal Sent": ["Negotiation", "Lost"],
+  Negotiation: ["Won", "Lost"],
+  Won: [],
+  Lost: [],
+};
+
 
 export const createLead = async (leadData) => {
   const duplicateCheck = await Lead.findOne({email: leadData.email, isDeleted: false});
@@ -44,12 +75,6 @@ export const getLeads = async (user, query) => {
 
 
   if (deleted) {
-    const allowedDeletedValues = [
-      "true",
-      "false",
-      "all"
-    ];
-
     if (deleted && !allowedDeletedValues.includes(deleted)) {
       throw new ApiError(400, "Invalid deleted query parameter.")
     }
@@ -85,9 +110,7 @@ export const getLeads = async (user, query) => {
       throw new ApiError(404, "User not found.")
     }
   
-    const assignableRoles = ["manager", "member"];
-  
-    if (!assignableRoles.includes(assignedUser.role)) {
+    if (!ASSIGNABLE_ROLES.includes(assignedUser.role)) {
       throw new ApiError(400, "Lead can only be assigned to a manager or member.");
     }
   
@@ -99,29 +122,20 @@ export const getLeads = async (user, query) => {
   }
 
   if (search) {
+    const regex = new RegExp(search, "i");
     filter.$or = [
       {
-        name: new RegExp(search, "i")
+        name: regex
       },
       {
-        email: new RegExp(search, "i")
+        email: regex
       },
       {
-        company: new RegExp(search, "i")
+        company: regex
       },
     ];
   }
 
-  const allowedSortFields = [
-    "name",
-    "company",
-    "createdAt"
-  ];
-
-  const allowedOrderValues = [
-    "asc",
-    "desc"
-  ];
 
   if (sort && !allowedSortFields.includes(sort)) {
     throw new ApiError(400, "Invalid sort query parameter.");
@@ -176,7 +190,7 @@ export const getLeads = async (user, query) => {
 
 
 export const getLeadById = async (id, user) => {
-  validateObjectId(id, "lead");
+  validateObjectId(id, "Lead");
 
   const lead = await Lead.findOne({_id: id, isDeleted: false}).populate("assignedTo", "name email role")
   .populate("createdBy", "name email role")
@@ -186,7 +200,7 @@ export const getLeadById = async (id, user) => {
     throw new ApiError(404, "Lead not found.");
   }
 
-  if (user.role === "member" && !lead.assignedTo || !lead.assignedTo._id.equals(user.userId)) {
+  if (user.role === "member" && (!lead.assignedTo || !lead.assignedTo._id.equals(user.userId))) {
     throw new ApiError(403, "You are not authorized to access this lead.");
   }
 
@@ -195,7 +209,7 @@ export const getLeadById = async (id, user) => {
 
 
 export const updateLead = async (id, updateData) => {
-  validateObjectId(id, "lead");
+  validateObjectId(id, "Lead");
 
   const lead = await Lead.findOne({_id: id, isDeleted: false});
 
@@ -240,15 +254,13 @@ export const updateLead = async (id, updateData) => {
 
 
 export const assignLead = async (leadId, assignedTo) => {
-  validateObjectId(leadId, "lead");
+  validateObjectId(leadId, "Lead");
 
   const lead = await Lead.findOne({_id: leadId, isDeleted: false});
 
   if (!lead) {
     throw new ApiError(404, "Lead not found.");
   }
-
-  const closedStatuses = ["Won", "Lost"];
 
   if(closedStatuses.includes(lead.status)) {
     throw new ApiError(400, "Cannot assign a lead that is already Won or Lost.");
@@ -264,9 +276,7 @@ export const assignLead = async (leadId, assignedTo) => {
     throw new ApiError(404, "User not found.");
   }
 
-  const assignableRoles = ["manager", "member"];
-
-  if (!assignableRoles.includes(user.role)) {
+  if (!ASSIGNABLE_ROLES.includes(user.role)) {
     throw new ApiError(400, "Lead can only be assigned to a manager or member.");
   }
 
@@ -283,7 +293,7 @@ export const assignLead = async (leadId, assignedTo) => {
 
 
 export const changeLeadStatus = async (leadId, newStatus, currentUser) => {
-  validateObjectId(leadId, "lead");
+  validateObjectId(leadId, "Lead");
 
   const lead = await Lead.findOne({
     _id: leadId, 
@@ -293,8 +303,6 @@ export const changeLeadStatus = async (leadId, newStatus, currentUser) => {
   if (!lead) {
     throw new ApiError(404, "Lead not found.");
   }
-
-  const closedStatuses = ["Won", "Lost"];
 
   if (closedStatuses.includes(lead.status)) {
     throw new ApiError(400, "Cannot change the status of a lead that is already won or lost.")
@@ -312,17 +320,6 @@ export const changeLeadStatus = async (leadId, newStatus, currentUser) => {
     return lead;
   }
 
-  const allowedTransitions = {
-    New: ["Assigned"],
-    Assigned: ["Contacted", "Lost"],
-    Contacted: ["Qualified", "Lost"],
-    Qualified: ["Proposal Sent", "Lost"],
-    "Proposal Sent": ["Negotiation", "Lost"],
-    Negotiation: ["Won", "Lost"],
-    Won: [],
-    Lost: [],
-  };
-
   const nextStatuses = allowedTransitions[lead.status];
 
   if(!nextStatuses.includes(newStatus)) {
@@ -338,7 +335,7 @@ export const changeLeadStatus = async (leadId, newStatus, currentUser) => {
 
 
 export const addNote = async (leadId, text, currentUser) => {
-  validateObjectId(leadId, "lead");
+  validateObjectId(leadId, "Lead");
 
   const trimmedText = text?.trim();
 
@@ -369,8 +366,9 @@ export const addNote = async (leadId, text, currentUser) => {
   return lead;
 }
 
+
 export const deleteLead = async(leadId, currentUser) => {
-  validateObjectId(leadId, "lead");
+  validateObjectId(leadId, "Lead");
 
   const lead = await Lead.findOne({
     _id: leadId, 
@@ -390,7 +388,7 @@ export const deleteLead = async(leadId, currentUser) => {
 
 
 export const restoreLead = async(leadId) => {
-  validateObjectId(leadId, "lead");
+  validateObjectId(leadId, "Lead");
 
   const lead = await Lead.findOne({
     _id: leadId,

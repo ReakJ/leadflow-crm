@@ -3,6 +3,29 @@ import Lead from "../models/Lead.js";
 import User, { USER_ROLES } from "../models/User.js";
 import { validateObjectId } from "../utils/validateObjectId.js";
 
+const allowedDeletedValues = [
+  "true",
+  "false",
+  "all"
+];
+
+const allowedActiveValues = [
+  "true",
+  "false"
+];
+
+const allowedSortFields = [
+  "name",
+  "email",
+  "createdAt"
+];
+
+const allowedOrderValues = [
+  "asc",
+  "desc"
+];
+
+
 export const createUser = async (userData, currentUser) => {
   const { name, email, password, role } = userData;
   
@@ -45,12 +68,6 @@ export const getUsers = async (query) => {
   const filter = {};
 
 
-  const allowedDeletedValues = [
-    "true",
-    "false",
-    "all"
-  ];
-
   if (deleted && !allowedDeletedValues.includes(deleted)) {
     throw new ApiError(400, "Invalid deleted query parameter.");
   }
@@ -61,11 +78,6 @@ export const getUsers = async (query) => {
     filter.isDeleted = true;
   }
 
-
-  const allowedActiveValues = [
-    "true",
-    "false"
-  ];
 
   if (active && !allowedActiveValues.includes(active)) {
     throw new ApiError(400, "Invalid active query parameter.");
@@ -99,17 +111,6 @@ export const getUsers = async (query) => {
     ]
   }
 
-
-  const allowedSortFields = [
-    "name",
-    "email",
-    "createdAt"
-  ];
-
-  const allowedOrderValues = [
-    "asc",
-    "desc"
-  ];
 
   if (sort && !allowedSortFields.includes(sort)) {
     throw new ApiError(400, "Invalid sort query parameter.");
@@ -166,7 +167,7 @@ export const getUsers = async (query) => {
 }
 
 export const getUserById = async (userId) => {
-  validateObjectId(userId, "user");
+  validateObjectId(userId, "User");
 
   const user = await User.findOne({
     _id: userId,
@@ -181,7 +182,7 @@ export const getUserById = async (userId) => {
 }
 
 export const updateUserStatus = async (userId, isActive, currentUser) => {
-  validateObjectId(userId, "user");
+  validateObjectId(userId, "User");
 
   const user = await User.findOne({
     _id: userId,
@@ -247,12 +248,12 @@ export const deleteUser = async (userId, currentUser) => {
     throw new ApiError(403, "Managers can only delete members.")
   }
 
-  const hasActivateLeads = await Lead.exists({
+  const hasActiveLeads = await Lead.exists({
     assignedTo: user._id,
     isDeleted: false
   })
 
-  if (hasActivateLeads) {
+  if (hasActiveLeads) {
     throw new ApiError(409, "Cannot delete user because they are assigned to active leads. Reassign those leads before deleting the account.");
   }
 
@@ -264,7 +265,7 @@ export const deleteUser = async (userId, currentUser) => {
 }
 
 export const restoreUser = async (userId, currentUser) => {
-  validateObjectId(userId, "user");
+  validateObjectId(userId, "User");
 
   const user = await User.findOne({ 
     _id: userId,
