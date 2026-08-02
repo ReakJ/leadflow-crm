@@ -262,3 +262,26 @@ export const deleteUser = async (userId, currentUser) => {
 
   await user.save();
 }
+
+export const restoreUser = async (userId, currentUser) => {
+  validateObjectId(userId, "user");
+
+  const user = await User.findOne({ 
+    _id: userId,
+    isDeleted: true 
+  })
+
+  if (!user) {
+    throw new ApiError(404, "User not found.")
+  }
+
+  if (currentUser.role === "manager" && user.role !== "member") {
+    throw new ApiError(403, "Manager can only restore members.");
+  }
+
+  user.isDeleted = false;
+  user.deletedAt = null;
+  user.deletedBy = null;
+
+  await user.save();
+}

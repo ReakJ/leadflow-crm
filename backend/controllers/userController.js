@@ -79,3 +79,18 @@ export const deleteUser = async (req, res, next) => {
     return next(error)
   }
 }
+
+export const restoreUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const currentUser = req.user;
+
+    await userService.restoreUser(id, currentUser);
+    return res.status(200).json({
+      success: true,
+      "message": "User restored successfully."
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
