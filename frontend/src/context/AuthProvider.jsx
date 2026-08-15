@@ -1,6 +1,4 @@
 import { 
-  createContext, 
-  useContext, 
   useEffect, 
   useState 
 } from "react";
@@ -11,7 +9,7 @@ import {
   getCurrentUser
 } from "../services/authService";
 
-const AuthContext = createContext();
+import { AuthContext } from "./AuthContext";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -31,21 +29,19 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
   
-  async function checkAuth() {
-    try {
-      const user = await getCurrentUser();
-
-      setUser(user);
-
-    } catch (error) {
-      setUser(null);
-    
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
+    async function checkAuth() {
+      try {
+        const user = await getCurrentUser();
+
+        setUser(user);
+      } catch {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     checkAuth();
   }, []);
 
@@ -61,14 +57,4 @@ export function AuthProvider({ children }) {
         {children}
      </AuthContext.Provider> 
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-
-  return context;
 }
