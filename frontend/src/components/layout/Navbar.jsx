@@ -21,7 +21,7 @@ const Navbar = () => {
           </button>
 
           <div className="avatar placeholder">
-            <div className="bg-primary text-primary-content w-9 rounded-full">
+            <div className="bg-primary text-primary-content w-9 rounded-full flex items-center justify-center">
               <span>
                 {user?.name?.charAt(0)?.toUpperCase() || "U"}
               </span>

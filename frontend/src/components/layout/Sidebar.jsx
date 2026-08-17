@@ -43,7 +43,7 @@ const Sidebar = () => {
           className="flex items-center gap-3 p-3 rounded-lg hover:bg-base-200 transition-colors"
         >
           <div className="avatar placeholder">
-            <div className="bg-primary text-primary-content w-10 rounded-full">
+            <div className="bg-primary text-primary-content w-10 rounded-full flex items-center justify-center">
               <span>
                 {user?.name?.charAt(0)?.toUpperCase() || "U"}
               </span>

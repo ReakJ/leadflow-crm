@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { Search, Ellipsis } from "lucide-react"
-import { getUsers } from "../../services/userService";
+import { Link } from "react-router-dom";
+import { Search } from "lucide-react"
+import { getUsers, restoreUser } from "../../services/userService";
 
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [restoringId, setRestoringId] = useState(null);
 
   const [filters, setFilters] = useState({
     search: "",
@@ -21,24 +23,22 @@ const UsersPage = () => {
 
   const [searchInput, setSearchInput] = useState("");
 
-  useEffect(() => {
-    async function fetchUsers() {
-      try {
-        // setLoading(true);
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
 
-        const response = await getUsers(filters);
+      const response = await getUsers(filters);
 
-        console.log(response);
-
-        setUsers(response.users);
-        setPagination(response.pagination);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+      setUsers(response.users);
+      setPagination(response.pagination);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
+  }
 
+  useEffect(() => {
     fetchUsers();
   }, [filters]);
 
@@ -56,10 +56,19 @@ const UsersPage = () => {
     };
   }, [searchInput]);
 
-  if (loading) {
-    return <div>Loading users...</div>
- }
+  const handleRestore = async (userId) => {
+    try {
+      setRestoringId(userId)
 
+      await restoreUser(userId);
+
+      await fetchUsers();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setRestoringId(null);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -190,7 +199,13 @@ const UsersPage = () => {
       {/* Users Table */}
       <div className="card bg-base-100 border border-base-300">
         <div className="card-body p-0">
-          <div className="overflow-x-auto">
+          <div className="relative overflow-x-auto">
+
+            {loading && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-base-100/70 backdrop-blur-2xl">
+                <span className="loading loading-spinner loading-lg text-primary"/>
+              </div>
+            )}
 
             <table className="table">
 
@@ -215,7 +230,7 @@ const UsersPage = () => {
                       <div className="flex items-center gap-3">
 
                         <div className="avatar placeholder">
-                          <div className="bg-primary text-center text-primary-content w-10 rounded-full">
+                          <div className="bg-primary text-primary-content w-10 rounded-full flex items-center justify-center">
                             <span>
                               {user.name?.charAt(0)?.toUpperCase() || "U"}
                             </span>
@@ -258,12 +273,30 @@ const UsersPage = () => {
 
                     {/* Actions */}
                     <td className="text-right">
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm btn-square"
-                      >
-                        <Ellipsis size={18}/>
-                      </button>
+                      {filters.deleted === "true" ? (
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline"
+                          disabled={restoringId === user.id}
+                          onClick={() => handleRestore(user.id)}
+                        >
+                          {restoringId === user.id ? (
+                            <>
+                              <span className="loading loading-spinner loading-xs"/>
+                              Restoring...
+                            </>
+                          ) : (
+                            "Restore"
+                          )}
+                        </button>
+                      ) : (
+                        <Link
+                          to={`/users/${user.id}`}
+                          className="btn btn-ghost btn-sm"
+                        >
+                          Manage
+                        </Link>
+                      )}
                     </td>
 
                   </tr>
