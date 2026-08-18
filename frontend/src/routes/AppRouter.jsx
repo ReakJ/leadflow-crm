@@ -8,6 +8,7 @@ import LoginPage from "../pages/auth/LoginPage";
 import DashboardPage from "../pages/dashboard/DashboardPage";
 import LeadsPage from "../pages/leads/LeadsPage";
 import UsersPage from "../pages/users/UsersPage";
+import AddUserPage from "../pages/users/AddUserPage";
 import ManageUserPage from "../pages/users/ManageUserPage";
 import ProfilePage from "../pages/profile/ProfilePage";
 
@@ -26,6 +27,7 @@ const router = createBrowserRouter(
           <Route index element={<DashboardPage />} />
           <Route path="leads" element={<LeadsPage />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="users/new" element={<AddUserPage />} />
           <Route path="users/:id" element={<ManageUserPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>

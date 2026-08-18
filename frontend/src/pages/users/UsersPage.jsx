@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react"
 import { getUsers, restoreUser } from "../../services/userService";
@@ -23,7 +23,7 @@ const UsersPage = () => {
 
   const [searchInput, setSearchInput] = useState("");
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -36,11 +36,11 @@ const UsersPage = () => {
     } finally {
       setLoading(false);
     }
-  }
+  }, [filters]);
 
   useEffect(() => {
     fetchUsers();
-  }, [filters]);
+  }, [fetchUsers]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -85,12 +85,12 @@ const UsersPage = () => {
           </p>
         </div>
 
-        <button
-          type="button"
+        <Link
+          to="/users/new"
           className="btn btn-primary"
         >
           + Add User
-        </button>
+        </Link>
       </div>
 
       {/* Toolbar */}
@@ -182,7 +182,6 @@ const UsersPage = () => {
                   page: 1,
                 }))
               }}
-              defaultValue="createdAt-desc"
             >
               <option value="createdAt-desc">Newest</option>
               <option value="createdAt-asc">Oldest</option>
