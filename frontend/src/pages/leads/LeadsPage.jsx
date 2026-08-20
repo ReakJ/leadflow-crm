@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
+import { useAuth } from "../../context/useAuth";
 
 import { getUsers } from "../../services/userService"
 import { getLeads } from "../../services/leadService";
@@ -11,6 +14,9 @@ const LeadsPage = () => {
   const [leads, setLeads] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const { user } = useAuth();
+  const isMember = user?.role === "member";
 
   const [filters, setFilters] = useState({
     search: "",
@@ -41,12 +47,14 @@ const LeadsPage = () => {
       }
     }
 
-    fetchAssignableUsers();
+    if (!isMember) {
+      fetchAssignableUsers();
+    }
   }, []);
 
   const fetchLeads = async () => {
     try {
-      // setLoading(true);
+      setLoading(true);
 
       const response = await getLeads(filters);
 
@@ -71,10 +79,6 @@ const LeadsPage = () => {
     }));
   };
 
-  if (loading) {
-    return <div>Loading leads...</div>;
-  }
-
   return (
     <div className="space-y-6">
       
@@ -90,12 +94,15 @@ const LeadsPage = () => {
           </p>
         </div>
 
-        <button
-          type="button"
-          className="btn btn-primary"
-        >
-          + Add Lead
-        </button>
+        {!isMember && (
+          <Link
+            to="/leads/new"
+            className="btn btn-primary"
+          >
+            + Add Lead
+          </Link>
+        )}
+
       </div>
 
       {/* Toolbar */}
@@ -103,6 +110,7 @@ const LeadsPage = () => {
         filters={filters}
         onFilterChange={handleFilterChange}
         users={users}
+        isMember={isMember}
       />
 
       {/* Table */}
@@ -110,6 +118,7 @@ const LeadsPage = () => {
         leads={leads}
         filters={filters}
         loading={loading}
+        isMember={isMember}
       />
 
       {/* Pagination */}

@@ -7,6 +7,7 @@ const LeadToolbar = ({
   filters, 
   onFilterChange,
   users,
+  isMember
 }) => {
 
   const [searchInput, setSearchInput] = useState(filters.search);
@@ -83,33 +84,37 @@ const LeadToolbar = ({
             <option value="Lost">Lost</option>
           </select>
 
-          {/* Assigned To */}
-          <SearchableSelect 
-            value={filters.assignedTo}
-            options={assigneeOptions}
-            onChange={(value) => {
-              onFilterChange({
-                assignedTo: value,
-              });
-            }}
-            placeholder="All assignees"
-            searchPlaceholder="Search assignee..."
-          />
+          {!isMember && (
+            <>
+              {/* Assigned To */}
+              <SearchableSelect 
+                value={filters.assignedTo}
+                options={assigneeOptions}
+                onChange={(value) => {
+                  onFilterChange({
+                    assignedTo: value,
+                  });
+                }}
+                placeholder="All assignees"
+                searchPlaceholder="Search assignee..."
+              />
 
-          {/* View */}
-          <select
-            className="select select-bordered w-full xl:w-40"
-            value={filters.deleted}
-            onChange={(event) => {
-              onFilterChange({ 
-                deleted: event.target.value 
-              });
-            }}
-          >
-            <option value="false">Current leads</option>
-            <option value="true">Deleted leads</option>
-            <option value="all">All leads</option>
-          </select>
+              {/* View */}
+              <select
+                className="select select-bordered w-full xl:w-40"
+                value={filters.deleted}
+                onChange={(event) => {
+                  onFilterChange({ 
+                    deleted: event.target.value 
+                  });
+                }}
+              >
+                <option value="false">Current leads</option>
+                <option value="true">Deleted leads</option>
+                <option value="all">All leads</option>
+              </select>
+            </>
+          )}
 
           {/* Sort */}
           <select

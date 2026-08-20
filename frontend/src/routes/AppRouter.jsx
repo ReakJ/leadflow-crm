@@ -30,7 +30,7 @@ const router = createBrowserRouter(
           <Route index element={<DashboardPage />} />
 
           <Route path="leads" element={<LeadsPage />} />
-          <Route path="lead/new" element={<AddLeadPage />} />
+          <Route path="leads/new" element={<AddLeadPage />} />
           <Route path="leads/:id" element={<ManageLeadPage />} />
           <Route path="leads/:id/notes" element={<LeadNotesPage />} />
 

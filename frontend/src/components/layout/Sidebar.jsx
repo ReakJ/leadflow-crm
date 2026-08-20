@@ -22,12 +22,15 @@ const Sidebar = () => {
       path: "/leads",
       icon: ContactRound,
     },
-    {
+  ];
+
+  if (user?.role !== "member") {
+    navigation.push({
       label: "Users",
       path: "/users",
       icon: UsersRound,
-    },
-  ];
+    },)
+  }
 
   return (
     <aside className="hidden lg:flex w-64 h-full bg-base-100 border-r border-base-300 flex-col">

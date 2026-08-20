@@ -79,8 +79,11 @@ export const getLeads = async (user, query) => {
       throw new ApiError(400, "Invalid deleted query parameter.")
     }
 
-    if (user.role === "member" && deleted) {
-      throw new ApiError(403, "Members are not allowed to see deleted leads.");
+    if (user.role === "member" && deleted !== undefined && deleted !== "false") {
+      throw new ApiError(
+        403,
+        "Members are not allowed to see deleted leads."
+      );
     }
 
     if (deleted === undefined || deleted === "false") {
@@ -196,7 +199,7 @@ export const getLeads = async (user, query) => {
 export const getLeadById = async (id, user) => {
   validateObjectId(id, "Lead");
 
-  const lead = await Lead.findOne({_id: id, isDeleted: false}).populate("assignedTo", "name email role")
+  const lead = await Lead.findOne({_id: id, isDeleted: false}).populate("assignedTo", "name email role isActive")
   .populate("createdBy", "name email role")
   .populate("notes.addedBy", "name email role");
 
