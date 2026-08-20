@@ -14,6 +14,9 @@ import ProfilePage from "../pages/profile/ProfilePage";
 
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
+import AddLeadPage from "../pages/leads/AddLeadPage";
+import ManageLeadPage from "../pages/leads/ManageLeadPage";
+import LeadNotesPage from "../pages/leads/LeadNotesPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,10 +28,16 @@ const router = createBrowserRouter(
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<DashboardPage />} />
+
           <Route path="leads" element={<LeadsPage />} />
+          <Route path="lead/new" element={<AddLeadPage />} />
+          <Route path="leads/:id" element={<ManageLeadPage />} />
+          <Route path="leads/:id/notes" element={<LeadNotesPage />} />
+
           <Route path="users" element={<UsersPage />} />
           <Route path="users/new" element={<AddUserPage />} />
           <Route path="users/:id" element={<ManageUserPage />} />
+
           <Route path="profile" element={<ProfilePage />} />
         </Route>
       </Route>

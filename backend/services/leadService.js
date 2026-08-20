@@ -173,7 +173,11 @@ export const getLeads = async (user, query) => {
 
   const skip = (pageNumber - 1) * limitNumber;
 
-  const leads = await Lead.find(filter).sort(sortOptions).skip(skip).limit(limitNumber);
+  const leads = await Lead.find(filter)
+    .populate("assignedTo", "name email role isActive")
+    .sort(sortOptions)
+    .skip(skip)
+    .limit(limitNumber);
   const totalItems = await Lead.countDocuments(filter);
   const totalPages = Math.ceil(totalItems / limitNumber);
 
