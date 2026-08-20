@@ -132,7 +132,7 @@ const ManageLeadPage = () => {
           </h2>
 
           <div className="mt-6 overflow-x-auto">
-            <ul className="steps steps-horizontal w-full min-w-[700px]">
+            <ul className="steps steps-vertical sm:steps-horizontal w-full">
               
               {leadStatuses.map((status) => {
                 const currentIndex = leadStatuses.indexOf(lead.status);
