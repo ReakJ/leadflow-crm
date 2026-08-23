@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom"
 
 import { useAuth } from "../../context/useAuth";
+import LeadProgress from "../../components/leads/LeadProgress";
 
-import { getLeadById } from "../../services/leadService";
+import { getLeadById, changeLeadStatus } from "../../services/leadService";
 
 const ManageLeadPage = () => {
   const { id } = useParams();
@@ -14,15 +15,25 @@ const ManageLeadPage = () => {
   const [lead, setLead] = useState(null);
   const [loading, setLoading] = useState(null);
 
-  const leadStatuses = [
-    "New",
-    "Assigned",
-    "Contacted",
-    "Qualified",
-    "Proposal Sent",
-    "Negotiation",
-    "Won"
-  ];
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  const handleStatusChange = async (newStatus) => {
+    try {
+      setUpdatingStatus(true);
+
+      const response = await changeLeadStatus(id, newStatus);
+
+      setLead((previous) => ({
+        ...previous,
+        status: response.data.lead.status,
+      }));
+
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setUpdatingStatus(false);
+    }
+  }
 
   useEffect(() => {
     const fetchLead = async () => {
@@ -124,45 +135,11 @@ const ManageLeadPage = () => {
       </div>
 
       {/* Lead Progress */}
-      <div className="card bg-base-100 border border-base-300">
-        <div className="card-body">
-
-          <h2 className="card-title">
-            Lead Progress
-          </h2>
-
-          <div className="mt-6 overflow-x-auto">
-            <ul className="steps steps-vertical sm:steps-horizontal w-full">
-              
-              {leadStatuses.map((status) => {
-                const currentIndex = leadStatuses.indexOf(lead.status);
-                const statusIndex = leadStatuses.indexOf(status);
-
-                const isCompleted = statusIndex < currentIndex;
-                const isCurrent = statusIndex === currentIndex;
-
-                return (
-                  <li
-                    key={status}
-                    className={`step ${
-                      isCompleted || isCurrent
-                        ? "step-primary"
-                        : ""
-                    }`}
-                  >
-                    <span className="text-xs whitespace-nowrap">
-                      {status}
-                    </span>
-                  </li>
-                )
-              })}
-
-            </ul>
-          </div>
-
-        </div>
-
-      </div>
+      <LeadProgress 
+        status={lead.status}
+        onStatusChange={handleStatusChange}
+        updating={updatingStatus}
+      />
 
       {/* Lead Information */}
       <div className="card bg-base-100 border border-base-300">
