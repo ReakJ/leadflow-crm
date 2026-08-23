@@ -132,12 +132,9 @@ const LeadProgress = ({
                   )}
                 </button>
               </div>
-            )}
-          
+            )}          
           </>
         )}
-
-
       </div>
     </div>
   );
