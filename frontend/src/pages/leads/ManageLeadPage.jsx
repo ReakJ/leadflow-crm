@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { data, Link, useParams } from "react-router-dom"
+import { Link, useParams, useNavigate } from "react-router-dom"
 import toast from "react-hot-toast";
 
 import { useAuth } from "../../context/useAuth";
@@ -10,12 +10,14 @@ import LeadInformation from "../../components/leads/LeadInformation";
 
 import { updateLeadSchema } from "../../schemas/leadSchemas";
 
-import { getLeadById, changeLeadStatus, updateLead, assignLead } from "../../services/leadService";
+import { getLeadById, changeLeadStatus, updateLead, assignLead, deleteLead } from "../../services/leadService";
 import { getUsers } from "../../services/userService"
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 const ManageLeadPage = () => {
   const { id } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const isMember = user?.role === "member";
 
@@ -23,9 +25,14 @@ const ManageLeadPage = () => {
   const [loading, setLoading] = useState(null);
 
   const [editing, setEditing] = useState(false);
+  
   const [updatingStatus, setUpdatingStatus] = useState(false);
+
   const [users, setUsers] = useState([]);
   const [assigning, seAssigning] = useState(false);
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const {
     register,
@@ -113,6 +120,29 @@ const ManageLeadPage = () => {
       toast.error(message);
     } finally {
       seAssigning(false);
+    }
+  }
+
+  const handleDelete = async () => {
+    try {
+      setDeleting(true);
+
+      await deleteLead(id);
+
+      toast.success("Lead deleted successfully.");
+
+      navigate("/leads");
+    } catch (error) {
+      console.error(error);
+
+      const message =
+        error.response?.data?.message ||
+        "Failed to delete lead. Please try again.";  
+      
+      toast.error(message);
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
     }
   }
 
@@ -296,6 +326,7 @@ const ManageLeadPage = () => {
               <button
                 type="button"
                 className="btn btn-error btn-outline"
+                onClick={() => setShowDeleteConfirm(true)}
               >
                 Delete Lead
               </button>
@@ -304,6 +335,28 @@ const ManageLeadPage = () => {
 
           </div>
         </div>
+      )}
+
+      {showDeleteConfirm && (
+        <ConfirmDialog 
+          title="Delete Lead?"
+          message={
+            <>
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-base-content">
+                {lead.name}
+              </span>
+              ?
+              <span className="block text-sm text-base-content/60 mt-2">
+                This lead will be moved to the deleted leads list and can be restored later.
+              </span>
+            </>
+          }
+          confirmText="Delete Lead"
+          onConfirm={handleDelete}
+          onCancel={() => setShowDeleteConfirm(false)}
+          loading={deleting}
+        />
       )}
     </div>
   )
