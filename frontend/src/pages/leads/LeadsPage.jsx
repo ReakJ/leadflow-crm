@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import { useAuth } from "../../context/useAuth";
 
 import { getUsers } from "../../services/userService"
-import { getLeads } from "../../services/leadService";
+import { getLeads, restoreLead } from "../../services/leadService";
 
 import LeadToolbar from "../../components/leads/LeadToolbar"
 import LeadTable from "../../components/leads/LeadTable";
@@ -30,6 +31,7 @@ const LeadsPage = () => {
   });
 
   const [users, setUsers] = useState([]);
+  const [restoringId, setRestoringId] = useState(null);
   
   useEffect(() => {
     async function fetchAssignableUsers() {
@@ -79,6 +81,28 @@ const LeadsPage = () => {
     }));
   };
 
+  const handleRestore = async (id) => {
+    try {
+      setRestoringId(id);
+
+      await restoreLead(id)
+
+      toast.success("Lead restored successfully.")
+      
+      await fetchLeads();
+    } catch (error) {
+      console.error(error);
+
+      const message =
+        error.response?.data?.message ||
+        "Failed to restore lead. Please try again.";
+
+      toast.error(message);
+    } finally {
+      setRestoringId(null);
+    }
+  }
+
   return (
     <div className="space-y-6">
       
@@ -119,6 +143,8 @@ const LeadsPage = () => {
         filters={filters}
         loading={loading}
         isMember={isMember}
+        onRestore={handleRestore}
+        restoringId={restoringId}
       />
 
       {/* Pagination */}

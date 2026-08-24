@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const LeadTable = ({ leads, filters, loading, isMember }) => {
+const LeadTable = ({ leads, filters, loading, isMember, onRestore, restoringId }) => {
   return (
     <div className="card bg-base-100 border border-base-300">
       <div className="card-body p-0">
@@ -112,12 +112,22 @@ const LeadTable = ({ leads, filters, loading, isMember }) => {
 
                     {/* Actions */}
                     <td className="text-right">
-                      {filters.deleted === "true" ? (
+                      {lead.isDeleted ? (
                         <button
                           type="button"
                           className="btn btn-sm btn-outline"
+                          disabled={restoringId === lead._id}
+                          onClick={() => onRestore(lead._id)}
                         >
-                          Restore
+                          {restoringId === lead._id ? (
+                            <>
+                             <span className="loading loading-spinner loading-sm"/>
+                              Restoring...
+                            
+                            </>
+                          ) : (
+                            "Restore"
+                          )}
                         </button>
                       ) : (
                         <div className="flex justify-end gap-1">

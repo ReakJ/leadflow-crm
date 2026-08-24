@@ -272,7 +272,7 @@ const UsersPage = () => {
 
                     {/* Actions */}
                     <td className="text-right">
-                      {filters.deleted === "true" ? (
+                      {user.isDeleted ? (
                         <button
                           type="button"
                           className="btn btn-sm btn-outline"
