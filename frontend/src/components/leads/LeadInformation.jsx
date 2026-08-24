@@ -1,7 +1,10 @@
+import { useState } from "react";
 import LeadFormFields from "./LeadFormFields";
+import SearchableSelect from "../common/SearchableSelect";
 
 const LeadInformation = ({ 
-  lead, 
+  lead,
+  users, 
   isMember, 
   editing, 
   setEditing,
@@ -10,8 +13,16 @@ const LeadInformation = ({
   handleSubmit,
   reset,
   isSubmitting,
-  onUpdate 
+  onUpdate,
+  onAssign,
+  assigning,
 }) => {
+
+  const [changingAssignee, setChangingAssignee] = useState(false);
+  const [selectedAssignee, setSelectedAssignee] = useState(
+    lead.assignedTo?._id || ""
+  );
+
   const restoreForm = () => {
     reset({
       name: lead.name || "",
@@ -21,6 +32,17 @@ const LeadInformation = ({
       source: lead.source || "",
     });
   }
+
+  const assigneeOptions = users
+    .filter(
+      (user) => 
+        user.isActive &&
+        (user.role === "member" || user.role === "manager")
+    )
+    .map((user) => ({
+      value: user.id,
+      label: user.name,
+    }));
 
   const handleEdit = () => {
     restoreForm();
@@ -164,11 +186,61 @@ const LeadInformation = ({
           {/* Assignment */}
           {!isMember && (
             <div className="mt-8 pt-6 border-t border-base-300">
+
               <h3 className="text-sm font-semibold text-base-content/80">
                 Assignment
               </h3>
 
-              {lead.assignedTo ? (
+              {changingAssignee ? (
+                <div className="mt-4 space-y-4">
+
+                  <SearchableSelect 
+                    value={selectedAssignee}
+                    options={assigneeOptions}
+                    onChange={setSelectedAssignee}
+                    placeholder="Select assignee"
+                    searchPlaceholder="Search assignee..."
+                  />
+
+                  <div className="flex justify-end gap-2">
+
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      disabled={assigning}
+                      onClick={() => {
+                        setSelectedAssignee(
+                          lead.assignedTo?._id || ""
+                        );
+                        setChangingAssignee(false);
+                      }}
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      disabled={assigning}
+                      onClick={async () => {
+                        await onAssign(selectedAssignee);
+                        setChangingAssignee(false);
+                      }}
+                    > 
+                      {assigning ? (
+                        <>
+                          <span className="loading loading-spinner loading-sm"/>
+                          Assigning...
+                        </>
+                      ) : (
+                        "Assign"
+                      )}
+                    </button>
+
+                  </div>
+
+                </div>
+              ) : lead.assignedTo ? (
                 <div className="mt-4 flex items-center justify-between gap-6">
 
                   {/* Assigned User */}
@@ -211,6 +283,12 @@ const LeadInformation = ({
                   <button
                     type="button"
                     className="btn btn-outline btn-sm"
+                    onClick={() => {
+                      setSelectedAssignee(
+                        lead.assignedTo?._id || ""
+                      );
+                      setChangingAssignee(true);
+                    }}
                   >
                     Change Assignee
                   </button>
@@ -232,6 +310,10 @@ const LeadInformation = ({
                   <button
                     type="button"
                     className="btn btn-outline btn-sm"
+                    onClick={() => {
+                      setSelectedAssignee("");
+                      setChangingAssignee(true);
+                    }}
                   >
                     Assign Lead
                   </button>

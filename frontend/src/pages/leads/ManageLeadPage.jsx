@@ -10,7 +10,8 @@ import LeadInformation from "../../components/leads/LeadInformation";
 
 import { updateLeadSchema } from "../../schemas/leadSchemas";
 
-import { getLeadById, changeLeadStatus, updateLead } from "../../services/leadService";
+import { getLeadById, changeLeadStatus, updateLead, assignLead } from "../../services/leadService";
+import { getUsers } from "../../services/userService"
 
 const ManageLeadPage = () => {
   const { id } = useParams();
@@ -22,6 +23,9 @@ const ManageLeadPage = () => {
   const [loading, setLoading] = useState(null);
 
   const [editing, setEditing] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [assigning, seAssigning] = useState(false);
 
   const {
     register,
@@ -42,7 +46,6 @@ const ManageLeadPage = () => {
     },
   });
 
-  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   const handleUpdate = async (data) => {
     try {
@@ -84,6 +87,35 @@ const ManageLeadPage = () => {
     }
   }
 
+  const handleAssignee = async (assignedTo) => {
+    if (!assignedTo) {
+      toast.error("Please select an assignee.");
+      return;
+    }
+
+    try {
+      seAssigning(true);
+
+      await assignLead(id, assignedTo);
+
+      const response = await getLeadById(id);
+
+      setLead(response.data.lead);
+
+      toast.success("Lead assigned successfully.");
+    } catch (error) {
+      console.error(error);
+
+      const message =
+        error.response?.data?.message ||
+        "Failed to assign lead. Please try again.";
+
+      toast.error(message);
+    } finally {
+      seAssigning(false);
+    }
+  }
+
   useEffect(() => {
     const fetchLead = async () => {
       try {
@@ -101,6 +133,26 @@ const ManageLeadPage = () => {
     
     fetchLead();
   }, [id])
+
+  useEffect(() => {
+    const fetchAssignableUsers = async () => {
+      try {
+        const response = await getUsers({
+          active: "true",
+          deleted: "false",
+          limit: 100,
+        });
+
+        setUsers(response.users);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (!isMember) {
+      fetchAssignableUsers();
+    }
+  }, [isMember]);
 
   useEffect(() => {
     if (lead) {
@@ -205,6 +257,7 @@ const ManageLeadPage = () => {
       {/* Lead Information */}
       <LeadInformation 
         lead={lead}
+        users={users}
         isMember={isMember}
         editing={editing}
         setEditing={setEditing}
@@ -214,6 +267,8 @@ const ManageLeadPage = () => {
         reset={reset}
         isSubmitting={isSubmitting}
         onUpdate={handleUpdate}
+        onAssign={handleAssignee}
+        assigning={assigning}
       />
       
 
