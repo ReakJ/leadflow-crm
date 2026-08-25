@@ -41,10 +41,7 @@ const Sidebar = () => {
       </div>
 
       <div className="px-3 mt-6">
-        <NavLink
-          to="/profile"
-          className="flex items-center gap-3 p-3 rounded-lg hover:bg-base-200 transition-colors"
-        >
+        <div className="flex items-center gap-3 p-3">
           <div className="avatar placeholder">
             <div className="bg-primary text-primary-content w-10 rounded-full flex items-center justify-center">
               <span>
@@ -62,7 +59,7 @@ const Sidebar = () => {
               {user?.role || "Member"}
             </p>
           </div>
-        </NavLink>
+        </div>
       </div>
 
       <nav className="px-3 mt-6 flex-1">

@@ -11,6 +11,7 @@ import UsersPage from "../pages/users/UsersPage";
 import AddUserPage from "../pages/users/AddUserPage";
 import ManageUserPage from "../pages/users/ManageUserPage";
 import ProfilePage from "../pages/profile/ProfilePage";
+import SettingsPage from "../pages/settings/SettingsPage";
 
 import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
@@ -39,6 +40,7 @@ const router = createBrowserRouter(
           <Route path="users/:id" element={<ManageUserPage />} />
 
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Route>
     </>
