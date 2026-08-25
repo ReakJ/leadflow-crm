@@ -94,6 +94,8 @@ userSchema.methods.toSafeObject = function () {
         role: this.role,
         isActive: this.isActive,
         isDeleted: this.isDeleted,
+        createdAt: this.createdAt,
+        lastLoginAt: this.lastLoginAt
     };
 };
 
