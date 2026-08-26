@@ -5,9 +5,13 @@ import { Link } from "react-router-dom";
 import LeadOverviewChart from "../../components/dashboard/LeadOverviewChart";
 import LeadStatusChart from "../../components/dashboard/LeadStatusChart";
 
+import { useAuth } from "../../context/useAuth";
 import { getDashboard } from "../../services/dashboardService";
 
 const DashboardPage = () => {
+  const { user } = useAuth();
+  const isMember = user.role === "member";
+
   const [summary, setSummary] = useState(null);
   const [statusDistribution, setStatusDistribution] = useState([]);
   const [recentLeads, setRecentLeads] = useState([]);
@@ -272,7 +276,7 @@ const DashboardPage = () => {
                   <th>Lead</th>
                   <th>Company</th>
                   <th>Status</th>
-                  <th>Assigned To</th>
+                  {!isMember && <th>Assigned To</th>}
                 </tr>
               </thead>
 
@@ -291,6 +295,7 @@ const DashboardPage = () => {
                 ) : (
                   recentLeads.map((lead) => (
                     <tr key={lead._id}>
+                      
                       <td>
                         <div>
                           <p className="font-medium">
@@ -319,13 +324,16 @@ const DashboardPage = () => {
                         </span>
                       </td>
 
-                      <td>
-                        {lead.assignedTo?.name || (
-                          <span className="text-base-content/50">
-                            Unassigned
-                          </span>
-                        )}
-                      </td>
+                      {!isMember && (
+                        <td>
+                          {lead.assignedTo?.name || (
+                            <span className="text-base-content/50">
+                              Unassigned
+                            </span>
+                          )}
+                        </td>
+                      )}
+
                     </tr>
                   )))
                 }

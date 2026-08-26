@@ -30,14 +30,18 @@ const LeadToolbar = ({
   ];
 
   useEffect(() => {
+    if (searchInput === filters.search) {
+      return;
+    }
+
     const timer = setTimeout(() => {
-      onFilterChange({search: searchInput});
+      onFilterChange({ search: searchInput });
     }, 400);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [searchInput]);
+  }, [searchInput, filters.search]);
 
   return (
     <div className="card bg-base-100 border border-base-300">

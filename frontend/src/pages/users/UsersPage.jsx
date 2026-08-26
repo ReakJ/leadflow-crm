@@ -43,6 +43,10 @@ const UsersPage = () => {
   }, [fetchUsers]);
 
   useEffect(() => {
+    if (searchInput === filters.search) {
+      return;
+    }
+    
     const timer = setTimeout(() => {
       setFilters((previous) => ({
         ...previous,

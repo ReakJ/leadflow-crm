@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -54,7 +54,7 @@ const LeadsPage = () => {
     }
   }, []);
 
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -67,11 +67,11 @@ const LeadsPage = () => {
     } finally {
       setLoading(false);
     }
-  }
+  }, [filters]);
 
   useEffect(() => {
     fetchLeads();
-  }, [filters]);
+  }, [fetchLeads]);
 
   const handleFilterChange = (changes) => {
     setFilters((previous) => ({

@@ -198,7 +198,7 @@ const ManageLeadPage = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-[850px] items-center justify-center">
+      <div className="flex min-h-212.5 items-center justify-center">
         <span className="loading loading-spinner loading-xl text-primary"/>
       </div>
     );
