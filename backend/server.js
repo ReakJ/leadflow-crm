@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 import leadRoutes from "./routes/leadRoutes.js";
 import userRoutes from "./routes/userRoutes.js"
 import { errorMiddleware } from "./middleware/errorMiddleware.js";
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
   res.send("LeadFlow CRM Backend is Running!");
 })
 app.use("/api/auth", authRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/leads", leadRoutes);
 app.use("/api/users", userRoutes);
 
