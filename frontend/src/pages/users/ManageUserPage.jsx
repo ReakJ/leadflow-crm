@@ -65,11 +65,28 @@ const ManageUserPage = () => {
   }, [id]);
 
   if (loading) {
-    return <div>Loading user...</div>
+    return (
+      <div className="flex min-h-[850px] items-center justify-center">
+        <span className="loading loading-spinner loading-xl text-primary"/>
+      </div>
+    )
   }
 
   if (!user) {
-    return <div>User not found.</div>
+    return (
+      <div className="py-12 text-center">
+        <p className="font-medium">
+          User not found
+        </p>
+
+        <Link
+          to="/users"
+          className="btn btn-primary btn-sm mt-4"
+        >
+          Back to Users
+        </Link>
+      </div>
+    )
   }
 
   return (
