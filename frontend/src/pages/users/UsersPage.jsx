@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react"
+import toast from "react-hot-toast";
+
 import { getUsers, restoreUser } from "../../services/userService";
 
 
@@ -66,9 +68,17 @@ const UsersPage = () => {
 
       await restoreUser(userId);
 
+      toast.success("User restored successfully.")
+
       await fetchUsers();
     } catch (error) {
       console.error(error);
+
+      const message =
+        error.response?.data?.message ||
+        "Failed to restore user. Please try again.";
+
+      toast.error(message);
     } finally {
       setRestoringId(null);
     }

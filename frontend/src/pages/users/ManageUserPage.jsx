@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+
 import { getUserById, updateUserStatus, deleteUser } from "../../services/userService";
 
 import ConfirmDialog from "../../components/common/ConfirmDialog";
@@ -26,6 +28,12 @@ const ManageUserPage = () => {
       setUser(response.user);
     } catch (error) {
       console.error(error);
+
+      const message =
+        error.response?.data?.message ||
+        "Failed to change status. Please try again.";
+
+      toast.error(message);
     } finally {
       setUpdatingStatus(false);
     }
@@ -37,9 +45,17 @@ const ManageUserPage = () => {
 
       await deleteUser(id);
 
+      toast.success("User deleted successfully.");
+
       navigate("/users");
     } catch (error) {
       console.error(error);
+
+      const message =
+        error.response?.data?.message ||
+        "Failed to delete user. Please try again.";
+
+      toast.error(message);
     } finally {
       setDeleting(false);
       setShowDeleteConfirm(false);
