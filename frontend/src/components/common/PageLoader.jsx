@@ -4,7 +4,7 @@ const PageLoader = () => {
       <span className="loading loading-spinner loading-lg text-primary" />
 
       <p className="text-sm text-base-content/60">
-        Loading LeadFlow...
+        Loading Leadora...
       </p>
     </div>
   );

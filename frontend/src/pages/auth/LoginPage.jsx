@@ -42,13 +42,14 @@ const LoginPage = () => {
           <div className='card-body'>
             <div className='text-center mb-6'>
               <div className="flex justify-center mb-3">
-                <ChartNoAxesColumn
-                    className="text-primary"
-                    size={36}
+                <img
+                  src="/leadora-logo.png"
+                  alt="Leadora"
+                  className="h-15 w-15 object-contain"
                 />
               </div>
               <p className='text-xs uppercase tracking-widest text-base-content/60'>
-                LeadFlow CRM
+                Leadora CRM
               </p>
               <h1 className='text-3xl font-bold mt-2'>
                 Welcome back

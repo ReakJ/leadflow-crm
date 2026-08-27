@@ -14,7 +14,7 @@ const SettingsPage = () => {
         </h1>
 
         <p className="text-sm text-base-content/60 mt-1">
-          Manage your LeadFlow preferences.
+          Manage your Leadora preferences.
         </p>
       </div>
 
@@ -32,7 +32,7 @@ const SettingsPage = () => {
               </h2>
 
               <p className="text-sm text-base-content/60 mt-0.5">
-                Customize how LeadFlow looks.
+                Customize how Leadora looks.
               </p>
             </div>
           </div>

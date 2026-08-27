@@ -2,10 +2,13 @@ import { Outlet } from "react-router-dom";
 
 import Navbar from "../components/layout/Navbar";
 import Sidebar from "../components/layout/Sidebar";
+import PageTitle from "../components/common/PageTitle";
 
 const MainLayout = () => {
   return (
     <div className="h-screen bg-base-200 overflow-hidden">
+      <PageTitle />
+
       <Navbar/>
 
       <div className="flex h-[calc(100vh-4rem)]">
