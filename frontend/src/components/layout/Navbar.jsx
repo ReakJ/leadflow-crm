@@ -16,7 +16,7 @@ const Navbar = () => {
           <img
             src="/leadora-logo.png"
             alt="Leadora"
-            className="h-7 w-7 object-contain"
+            className="h-9 w-9 object-contain"
           />
 
           <span className="text-xl font-bold text-primary">
