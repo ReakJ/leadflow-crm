@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
-  res.send("LeadFlow CRM Backend is Running!");
+  res.send("Leadora CRM Backend is Running!");
 })
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
