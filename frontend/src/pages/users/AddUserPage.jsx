@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react'
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,6 +11,8 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../context/useAuth';
 
 const AddUserPage = () => {
+  const [showPassword, setShowPassword] = useState(false);
+
   const { 
     register, 
     handleSubmit,
@@ -76,7 +80,7 @@ const AddUserPage = () => {
             
             {/* Name */}
             <div>
-              <label htmlFor="name" className='label'>
+              <label htmlFor="name" className='label pb-1'>
                 <span className='label-text'>
                   Name
                 </span>
@@ -101,7 +105,7 @@ const AddUserPage = () => {
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className='label'>
+              <label htmlFor="email" className='label pb-1'>
                 <span className='label-text'>
                   Email
                 </span>
@@ -126,20 +130,34 @@ const AddUserPage = () => {
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className='label'>
+              <label htmlFor="password" className='label pb-1'>
                 <span className='label-text'>
                   Password
                 </span>
               </label>
 
-              <input 
-                id='password'
-                type='password'
-                placeholder='Create a password'
-                autoComplete='new-password'
-                className='input input-bordered w-full'
-                {...register("password")}
-              />
+              <div className='relative'>
+                <input 
+                  id='password'
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder='Create a password'
+                  autoComplete='new-password'
+                  className='input input-bordered w-full'
+                  {...register("password")}
+                />
+
+                <button
+                  type='button'
+                  onClick={() => setShowPassword(!showPassword)}
+                  className='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer'
+                >
+                  {showPassword ? (
+                    <EyeOff className='size-5 text-base-content/40'/>
+                  ) : (
+                    <Eye className='size-5 text-base-content/40'/>
+                  )}
+                </button>
+              </div>
 
               {errors.password && (
                 <p className='text-error text-sm mt-1'>
@@ -150,7 +168,7 @@ const AddUserPage = () => {
 
             {/* Role */}
             <div>
-              <label htmlFor="role" className='label'>
+              <label htmlFor="role" className='label pb-1'>
                 <span className='label-text'>
                   Role
                 </span>

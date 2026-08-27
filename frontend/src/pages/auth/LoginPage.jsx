@@ -1,7 +1,8 @@
-import { ChartNoAxesColumn } from "lucide-react";
+import { useState } from "react"; 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react"
 import toast from "react-hot-toast";
 
 import { useAuth } from "../../context/useAuth"
@@ -9,6 +10,8 @@ import { useAuth } from "../../context/useAuth"
 import { loginSchema } from "../../schemas/authSchemas";
 
 const LoginPage = () => {
+  const [showPassword, setShowPassword] = useState(false)
+  
   const { 
     register, 
     handleSubmit,
@@ -64,13 +67,20 @@ const LoginPage = () => {
               className='space-y-6'
             >
               <div>
-                <label htmlFor="email" className='label'>
+                <label htmlFor="email" className='label pb-1'>
                   <span className="label-text">
                     Email
                   </span>
                 </label>
 
-                <input placeholder="Enter your email" id='email' type='email' autoComplete="email" className='input input-bordered w-full' {...register("email")} />     
+                <input 
+                  placeholder="Enter your email" 
+                  id='email' 
+                  type='email' 
+                  autoComplete="email" 
+                  className='input input-bordered w-full' 
+                  {...register("email")} 
+                />     
               
                 {errors.email && (
                   <p className="text-error text-sm mt-1">
@@ -80,13 +90,34 @@ const LoginPage = () => {
               </div>
 
               <div>
-                <label htmlFor="password" className='label'>
+                <label htmlFor="password" className='label pb-1'>
                   <span className="label-text">
                     Password
                   </span>
                 </label>
 
-                <input placeholder="Enter your password" id='password' type='password' autoComplete="current-password" className='input input-bordered w-full' {...register("password")}/>
+                <div className="relative">
+                  <input 
+                    placeholder="Enter your password" 
+                    id='password' 
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password" 
+                    className='input input-bordered w-full' 
+                    {...register("password")}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                  >
+                    {showPassword? (
+                      <EyeOff className="size-5 text-base-content/40"/>
+                    ) : (
+                      <Eye className="size-5 text-base-content/40"/>
+                    )}
+                  </button>
+                </div>
 
                 {errors.password && (
                   <p className="text-error text-sm mt-1">
