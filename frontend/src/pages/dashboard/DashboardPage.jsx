@@ -130,7 +130,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
 
         <div className="card bg-base-100 border border-base-300">
           <div className="card-body p-5">
