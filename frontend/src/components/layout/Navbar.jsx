@@ -1,12 +1,21 @@
-import { Bell, Settings, UserRound } from "lucide-react";
+import { Bell, Settings, UserRound, Menu } from "lucide-react";
 
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/useAuth"
 
-const Navbar = () => {
+const Navbar = ({ onMenuClick }) => {
   const { user } = useAuth()
   return (
-    <header className="navbar min-h-16 bg-base-100 border-b border-base-300 px-6">
+    <header className="navbar min-h-16 bg-base-100 border-b border-base-300 px-3 lg:px-6">
+      <button
+        type="button"
+        onClick={onMenuClick}
+        className="mr-1 btn btn-ghost btn-square lg:hidden"
+        aria-label="Open navigation"
+      > 
+        <Menu size={21}/>
+      </button>
+
       <div className="flex-1">
         <Link
           to="/"

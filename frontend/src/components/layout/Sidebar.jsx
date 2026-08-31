@@ -8,7 +8,7 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/useAuth"
 
 
-const Sidebar = () => {
+const Sidebar = ({ mobile = false, onNavigate }) => {
   const { user, logout } = useAuth();
 
   const navigation = [
@@ -33,7 +33,13 @@ const Sidebar = () => {
   }
 
   return (
-    <aside className="hidden lg:flex w-64 h-full bg-base-100 border-r border-base-300 flex-col">
+    <aside 
+      className={
+        mobile
+          ? "w-64 h-full bg-base-100 border-r border-base-300 flex flex-col"
+          : "hidden lg:flex w-64 h-full bg-base-100 border-r border-base-300 flex-col"
+        }
+      >
       <div className="px-5 pt-5">
         <p className="text-xs uppercase tracking-widest text-base-content/50">
           CRM Workspace
@@ -76,6 +82,7 @@ const Sidebar = () => {
                 <NavLink
                   to={item.path}
                   end={item.path === "/"}
+                  onClick={onNavigate}
                   className={({ isActive }) =>
                     isActive 
                       ? "bg-primary text-primary-content"
