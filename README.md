@@ -1,33 +1,148 @@
-# LeadFlow CRM
+# Leadora
 
-> 🚧 Frontend is currently under development. The backend is feature-complete.
+> A full-stack CRM application for managing leads, users, assignments, and sales workflows.
 
-## Overview
+Leadora is a full-stack Customer Relationship Management (CRM) application built with the MERN stack. It provides a centralized platform for managing leads, tracking their progress through a structured sales pipeline, assigning leads to team members, managing users, and viewing business metrics through an analytics dashboard.
 
-LeadFlow CRM is a full-stack Customer Relationship Management (CRM) application designed to help businesses and teams manage users and sales leads through a secure role-based system.
+The project was built to explore and demonstrate real-world full-stack application development, including authentication, role-based authorization, REST APIs, database design, responsive UI development, and production deployment.
 
-The project is being developed using the MERN stack (MongoDB, Express.js, React, and Node.js). The backend is fully implemented with authentication, user management, lead management, and advanced querying features, while the React frontend is currently under development.
+## 🚀 Live Demo
 
-## Project Status
+**Live Application:** https://leadora-crm.vercel.app
 
-### ✅ Backend
+> The backend is hosted separately and may take a short moment to respond after a period of inactivity because the project uses a free-tier deployment.
 
-- JWT Authentication
-- Role-Based Authorization (Admin, Manager, Member)
-- User Management
-- Lead Management
-- Lead Assignment & Status Workflow
-- Notes
-- Search, Filtering, Sorting & Pagination
-- Soft Delete & Restore
-- Centralized Error Handling
+---
 
-### 🚧 Frontend
+## ✨ Features
 
-- React + Vite project initialized
-- UI development in progress
+### 🔐 Authentication & Authorization
 
-## Tech Stack
+- Secure user authentication using JWT
+- HTTP-only authentication cookies
+- Password hashing with bcrypt
+- Protected routes
+- Role-based access control
+- Automatic authentication state handling
+- Logout functionality
+
+### 👥 User Management
+
+- Create and manage users
+- Three user roles:
+  - Admin
+  - Manager
+  - Member
+- Activate/deactivate users
+- Soft delete users
+- Restore deleted users
+- Search users
+- Filter by role and status
+- Sort users
+- Paginated user listing
+
+### 🎯 Lead Management
+
+- Create and manage leads
+- Assign leads to team members
+- View detailed lead information
+- Edit lead information
+- Search leads
+- Filter leads by status and assignee
+- Sort leads
+- Pagination
+- Soft delete leads
+- Restore deleted leads
+- Role-based lead visibility
+
+### 📈 Lead Pipeline
+
+Leads can move through a structured sales workflow:
+
+```text
+New
+ ↓
+Assigned
+ ↓
+Contacted
+ ↓
+Qualified
+ ↓
+Proposal Sent
+ ↓
+Negotiation
+ ↓
+Won
+```
+
+A lead can also be marked as:
+
+```text
+Lost
+```
+
+`Lost` is treated as a terminal outcome rather than a step after `Won`.
+
+### 📝 Lead Notes
+
+- Add notes to individual leads
+- Track the user who created each note
+- View notes directly from the lead management page
+
+### 📊 Dashboard & Analytics
+
+The dashboard provides an overview of CRM activity, including:
+
+- Total leads
+- New leads
+- In-progress leads
+- Won leads
+- Conversion rate
+- Lead activity over time
+- Lead distribution by status
+- Recent leads
+- Configurable reporting periods:
+  - Last 7 days
+  - Last 30 days
+  - Last 90 days
+
+### 🎨 UI & User Experience
+
+- Responsive layout
+- Mobile navigation drawer
+- Light and dark themes
+- Persistent theme selection
+- Responsive dashboard cards
+- Interactive charts
+- Toast notifications
+- Searchable dropdowns
+- Responsive lead and user management interfaces
+- Custom Leadora branding
+
+### 📱 PWA Support
+
+Leadora includes basic Progressive Web App support:
+
+- Web app manifest
+- Custom favicon and app icons
+- Theme-aware browser UI
+- Mobile-friendly experience
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+- React
+- Vite
+- React Router
+- Axios
+- Tailwind CSS
+- DaisyUI
+- Recharts
+- Lucide React
+- React Hot Toast
 
 ### Backend
 
@@ -35,161 +150,489 @@ The project is being developed using the MERN stack (MongoDB, Express.js, React,
 - Express.js
 - MongoDB
 - Mongoose
-
-### Frontend
-
-- React
-- Vite
-
-### Authentication & Security
-
 - JWT
 - bcrypt
 - cookie-parser
+- CORS
+- dotenv
+- validator
 
-### Validation
+### Deployment
 
-- express-validator
-- validator.js
+- **Frontend:** Vercel
+- **Backend:** Render
+- **Database:** MongoDB Atlas
 
-### Development
+---
 
-- Git
-- GitHub
-- Postman
+## 🏗️ Architecture
 
-## Project Structure
+Leadora follows a separated frontend/backend architecture.
 
-LeadFlow-CRM/
+```text
+                    ┌──────────────────────┐
+                    │      Leadora UI      │
+                    │   React + Vite       │
+                    └──────────┬───────────┘
+                               │
+                            Axios
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │      REST API        │
+                    │ Node.js + Express    │
+                    └──────────┬───────────┘
+                               │
+                    ┌──────────▼───────────┐
+                    │       MongoDB         │
+                    │       Mongoose        │
+                    └───────────────────────┘
+```
+
+Authentication is handled using JWT tokens stored in HTTP-only cookies.
+
+The frontend communicates with the backend through RESTful API endpoints, while the backend handles authentication, authorization, business logic, validation, and database operations.
+
+---
+
+## 📁 Project Structure
+
+```text
+Leadora/
 │
 ├── backend/
-│   ├── src/
-│   │   ├── config/
-│   │   ├── controllers/
-│   │   ├── errors/
-│   │   ├── middleware/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   └── validators/
+│   ├── config/
+│   │   └── db.js
 │   │
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── dashboardController.js
+│   │   ├── leadController.js
+│   │   └── userController.js
+│   │
+│   ├── errors/
+│   │   └── ...
+│   │
+│   ├── middleware/
+│   │   ├── authMiddleware.js
+│   │   ├── errorMiddleware.js
+│   │   └── ...
+│   │
+│   ├── models/
+│   │   ├── Lead.js
+│   │   └── User.js
+│   │
+│   ├── routes/
+│   │   ├── authRoutes.js
+│   │   ├── dashboardRoutes.js
+│   │   ├── leadRoutes.js
+│   │   └── userRoutes.js
+│   │
+│   ├── scripts/
+│   │   └── seedAdmin.js
+│   │
+│   ├── services/
+│   │   ├── authService.js
+│   │   ├── dashboardService.js
+│   │   ├── leadService.js
+│   │   └── userService.js
+│   │
+│   ├── utils/
+│   │   └── ...
+│   │
+│   ├── validators/
+│   │   └── ...
+│   │
+│   ├── server.js
 │   └── package.json
 │
 ├── frontend/
+│   ├── public/
+│   │   ├── favicon-16x16.png
+│   │   ├── favicon-32x32.png
+│   │   ├── favicon-48x48.png
+│   │   ├── apple-touch-icon.png
+│   │   ├── leadora-logo.png
+│   │   └── site.webmanifest
+│   │
 │   ├── src/
+│   │   ├── components/
+│   │   │   ├── common/
+│   │   │   ├── layout/
+│   │   │   └── ...
+│   │   │
+│   │   ├── context/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   │
+│   ├── vercel.json
 │   └── package.json
 │
 └── README.md
+```
 
-## Backend Highlights
+---
 
-- Layered Architecture
-- JWT Authentication
-- Role-Based Access Control
-- Service Layer Business Logic
-- Soft Delete & Restore
-- Lead Assignment Workflow
-- Status Transition Rules
-- Search, Filtering, Sorting & Pagination
-- Centralized Error Handling
+## 👤 User Roles
 
-## Roadmap
+Leadora currently supports three roles.
 
-### ✅ Completed
+| Role | Permissions |
+|------|-------------|
+| **Admin** | Full system access, including user management |
+| **Manager** | Manage leads and users according to assigned permissions |
+| **Member** | Work with leads assigned to them |
 
-- Backend API
-- Authentication
-- User Management
-- Lead Management
+Role-based permissions are enforced on the **backend**, while the frontend also adapts its UI based on the user's role.
 
-### 🚧 In Progress
+For example, members do not have access to the user-management interface.
 
-- React Frontend
+---
 
-### 📌 Planned
+## 🔄 Lead Status Workflow
 
-- React Frontend
-- Dashboard & Analytics
-- Email Notifications
-- Unit & Integration Tests
-- Docker Support
+The lead pipeline is designed around a typical sales process:
 
-## Getting Started
+```text
+                    ┌─────────────┐
+                    │     New     │
+                    └──────┬──────┘
+                           ↓
+                    ┌─────────────┐
+                    │  Assigned   │
+                    └──────┬──────┘
+                           ↓
+                    ┌─────────────┐
+                    │  Contacted  │
+                    └──────┬──────┘
+                           ↓
+                    ┌─────────────┐
+                    │  Qualified  │
+                    └──────┬──────┘
+                           ↓
+                    ┌─────────────┐
+                    │  Proposal   │
+                    │     Sent    │
+                    └──────┬──────┘
+                           ↓
+                    ┌─────────────┐
+                    │ Negotiation │
+                    └──────┬──────┘
+                           ↓
+                    ┌─────────────┐
+                    │     Won     │
+                    └─────────────┘
+
+                           OR
+
+                    ┌─────────────┐
+                    │    Lost     │
+                    └─────────────┘
+```
+
+The backend controls valid status transitions to prevent invalid workflow changes.
+
+---
+
+## 🔌 API Overview
+
+### Authentication
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/auth/login` | Authenticate a user |
+| `POST` | `/api/auth/logout` | Log out the current user |
+| `GET` | `/api/auth/me` | Get the currently authenticated user |
+
+### Users
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/users` | Get users with filtering and pagination |
+| `POST` | `/api/users` | Create a user |
+| `GET` | `/api/users/:id` | Get a user |
+| `PATCH` | `/api/users/:id` | Update a user |
+| `PATCH` | `/api/users/:id/status` | Activate/deactivate a user |
+| `PATCH` | `/api/users/:id/restore` | Restore a deleted user |
+| `DELETE` | `/api/users/:id` | Soft delete a user |
+
+### Leads
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/leads` | Get leads with filtering and pagination |
+| `POST` | `/api/leads` | Create a lead |
+| `GET` | `/api/leads/:id` | Get lead details |
+| `PATCH` | `/api/leads/:id` | Update a lead |
+| `PATCH` | `/api/leads/:id/assign` | Assign a lead |
+| `PATCH` | `/api/leads/:id/status` | Update lead status |
+| `POST` | `/api/leads/:id/notes` | Add a note |
+| `PATCH` | `/api/leads/:id/restore` | Restore a deleted lead |
+| `DELETE` | `/api/leads/:id` | Soft delete a lead |
+
+### Dashboard
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/dashboard` | Get dashboard analytics |
+
+---
+
+## ⚙️ Getting Started
 
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
-cd LeadFlow-CRM
+git clone https://github.com/ReakJ/leadora-crm.git
+cd leadora-crm
 ```
 
-### 2. Set up the backend
+### 2. Install backend dependencies
 
 ```bash
 cd backend
 npm install
 ```
 
-### 3. Configure environment variables
+### 3. Configure backend environment variables
 
-Create a `.env` file inside the `backend` directory and add:
+Create a `.env` file inside the `backend` directory:
 
 ```env
-PORT=
-MONGODB_URI=
-JWT_SECRET=
-JWT_EXPIRES_IN=
-COOKIE_EXPIRES_IN=
-BCRYPT_SALT_ROUNDS=
-NODE_ENV=
+PORT=5000
+
+MONGODB_URI=your_mongodb_connection_string
+
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=your_jwt_expiration
+
+COOKIE_EXPIRES_IN=your_cookie_expiration
+
+BCRYPT_SALT_ROUNDS=your_salt_rounds
+
+NODE_ENV=development
+
+CLIENT_URL=http://localhost:5173
+
+ADMIN_NAME=your_admin_name
+ADMIN_EMAIL=your_admin_email
+ADMIN_PASSWORD=your_admin_password
 ```
 
-### 4. Seed the database
+### 4. Seed the initial admin
 
 ```bash
 npm run seed
 ```
 
-### 5. Start the backend server
+The seed script is idempotent. If an admin account with the configured email already exists, it will not create another account.
+
+### 5. Start the backend
 
 ```bash
 npm run dev
 ```
 
-### 6. Frontend (Coming Soon)
+The backend will run on:
 
-The React + Vite frontend has been initialized and is currently under development.
+```text
+http://localhost:5000
+```
 
-## Why LeadFlow?
+---
 
-LeadFlow was built to strengthen my understanding of backend application development using the MERN stack. The project focuses on designing clean REST APIs, implementing authentication and authorization, enforcing business rules through a service layer, and building a maintainable backend architecture that can be extended with a React frontend.
+### 6. Install frontend dependencies
 
-## API Overview
+Open a new terminal:
 
-### Authentication
+```bash
+cd frontend
+npm install
+```
 
-- POST /login
-- POST /logout
+### 7. Configure frontend environment variables
 
-### Users
+Create a `.env` file inside the `frontend` directory:
 
-- POST /users
-- GET /users
-- GET /users/:id
-- PATCH /users/:id
-- PATCH /users/:id/status
-- PATCH /users/:id/restore
-- DELETE /users/:id
+```env
+VITE_API_URL=http://localhost:5000/api
+```
 
-### Leads
+### 8. Start the frontend
 
-- POST /leads
-- GET /leads
-- GET /leads/:id
-- PATCH /leads/:id
-- PATCH /leads/:id/assign
-- PATCH /leads/:id/status
-- POST /leads/:id/notes
-- PATCH /leads/:id/restore
-- DELETE /leads/:id
+```bash
+npm run dev
+```
+
+The frontend will be available at:
+
+```text
+http://localhost:5173
+```
+
+---
+
+## 🌍 Production Deployment
+
+Leadora uses a split deployment architecture:
+
+```text
+Vercel
+   │
+   │ React Frontend
+   ▼
+Leadora UI
+   │
+   │ REST API
+   ▼
+Render
+   │
+   │ Express Backend
+   ▼
+MongoDB Atlas
+```
+
+### Frontend
+
+The React/Vite frontend is deployed on Vercel.
+
+Production environment variable:
+
+```env
+VITE_API_URL=https://leadora-backend.onrender.com/api
+```
+
+The frontend uses a Vercel rewrite configuration so React Router routes work correctly when refreshing pages directly.
+
+### Backend
+
+The Express backend is deployed on Render.
+
+The production backend uses:
+
+```env
+NODE_ENV=production
+CLIENT_URL=https://leadora-crm.vercel.app
+```
+
+Authentication cookies use secure cross-site settings in production so that the separately hosted frontend and backend can communicate securely.
+
+### Database
+
+Production data is stored in MongoDB Atlas using a separate production database from the development database.
+
+---
+
+## 🎨 Themes
+
+Leadora includes custom light and dark themes built using DaisyUI.
+
+The application remembers the user's selected theme using local storage.
+
+The browser's theme color is also synchronized with the active application theme for a more consistent experience on supported mobile browsers and installed PWAs.
+
+---
+
+## 📱 Responsive Design
+
+The application is designed to work across desktop and mobile screen sizes.
+
+On smaller screens:
+
+- The desktop sidebar is replaced by a mobile navigation menu.
+- The navigation opens with a slide-in animation.
+- Clicking outside the navigation closes it.
+- Selecting a navigation item automatically closes the menu.
+- Dashboard cards adapt to smaller screen widths.
+- Tables and management interfaces remain usable on smaller displays.
+
+---
+
+## 🧠 What I Learned
+
+Building Leadora provided practical experience with several aspects of modern full-stack development:
+
+- Designing REST APIs
+- Structuring an Express backend
+- Separating controllers, services, models, and routes
+- MongoDB and Mongoose data modeling
+- JWT authentication
+- HTTP-only cookies
+- Password hashing
+- Role-based authorization
+- Protected frontend routes
+- React state management
+- React Context
+- React Router
+- API integration with Axios
+- Debounced search
+- Filtering, sorting, and pagination
+- Soft deletion and restoration
+- Responsive UI design
+- Light/dark theme systems
+- Data visualization with Recharts
+- Production environment variables
+- CORS configuration
+- Cross-origin authentication
+- Deploying a full-stack application
+
+---
+
+## 🔮 Future Improvements
+
+Some possible improvements for future versions include:
+
+- Advanced dashboard analytics
+- Activity history and audit logs
+- More detailed lead activity tracking
+- Email integration
+- Lead import/export
+- Additional CRM automation
+- Improved notification system
+- Automated testing
+- Performance optimizations
+- More granular permission management
+
+---
+
+<!-- ## 📸 Screenshots
+
+> Screenshots of the application will be added here.
+
+### Dashboard
+
+<!-- Add dashboard screenshot -->
+
+<!-- ### Lead Management -->
+
+<!-- Add leads screenshot -->
+
+<!-- ### Lead Details -->
+
+<!-- Add lead details screenshot -->
+
+<!-- ### User Management -->
+
+<!-- Add users screenshot -->
+
+<!-- ### Dark & Light Themes -->
+
+<!-- Add theme screenshots -->
+
+--- -->
+
+## 📌 Project Status
+
+**Leadora V1 — Completed and deployed**
+
+The current version includes the core CRM functionality, authentication and authorization, lead and user management, dashboard analytics, responsive design, theming, and production deployment.
+
+Future improvements will be developed incrementally as the project evolves.
+
+---
+
+## 📄 License
+
+This project is currently intended as a personal learning and portfolio project.
