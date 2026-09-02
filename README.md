@@ -621,7 +621,7 @@ Some possible improvements for future versions include:
 
 <!-- Add theme screenshots -->
 
---- -->
+<!-- --- -->
 
 ## 📌 Project Status
 
